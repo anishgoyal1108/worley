@@ -1,0 +1,184 @@
+\documentclass{article}
+
+% For Unicode support
+\usepackage{xeCJK}
+
+% APA Citation
+\usepackage[
+  style           = apa,
+  citestyle       = authoryear,
+  sorting         = nyt,
+  sortcites       = true,
+  autocite        = inline,
+  citetracker     = false,
+  maxbibnames     = 99,
+  maxcitenames    = 2,
+  backend         = biber,
+  isbn            = false,
+  doi             = true,
+  urldate         = short,
+  backend         = biber,
+  defernumbers    = true
+]{biblatex}
+
+\DeclareBibliographyCategory{printcite}
+\newcommand{\printcite}[1]{%
+  \addtocategory{printcite}{#1}%
+  \defbibcheck{key#1}{
+    \iffieldequalstr{entrykey}{#1}
+    {}
+  {\skipentry}}%
+  \printbibliography[heading=none,check=key#1]%
+}
+\addbibresource{cite.bib}
+
+% Provide support on formatting SI Unit
+\usepackage{siunitx}
+\sisetup{per-mode=fraction}
+
+% Math package
+\usepackage{amsmath}
+\renewcommand{\frac}{\dfrac}
+
+\newcounter{source}
+\newcommand{\sourcemeta}[3]{\subsection{Student Researcher} #1 %
+  \subsection{Type} #2 %
+\subsection{Citation} \printcite{#3}}
+
+\newcommand{\source}[3]{\stepcounter{source} %
+  \section{Source \#\thesource} %
+\sourcemeta{#1}{#2}{#3}}
+
+% Customized reflection entry
+\newcounter{reflection}
+\newcommand{\reflection}[2]{\stepcounter{reflection} %
+  \section{Reflection \#\thereflection} 
+
+  \paragraph{Date} #1
+
+  \noindent Log what you have done, what you have discovered, what you have learned, 
+  what are your next steps\ldots 
+  \vspace*{-0.5cm}
+\paragraph{Initials} #2}
+
+% Customized reference
+\usepackage[hidelinks]{hyperref}
+
+% Better typesetting
+\usepackage{microtype}
+
+% Menukeys
+\usepackage[os=win]{menukeys}
+
+% Table
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{makecell}
+\newcolumntype{b}{>{\centering\arraybackslash}X}
+\newcolumntype{s}{>{\hsize=.4\hsize\centering}X}
+
+% Float
+\usepackage{newfloat}
+
+% 1.15 line spacing
+\usepackage{setspace}
+\setstretch{1.5}
+
+% Subfigure
+\usepackage{subcaption}
+\usepackage{caption}
+
+% Finer geometry
+\usepackage{geometry}
+\geometry{a4paper}
+
+% Define some constants
+\renewcommand{\title}{Yet Another Ship Hull}
+
+% Define field input, i.e., box
+\usepackage[most]{tcolorbox}
+\newenvironment{field}{\begin{tcolorbox}[%
+    enhanced, 
+    breakable,
+    colback = white, colframe = black,
+    sharp corners,
+    boxrule = 0pt, bottomrule = 1pt, toprule = 1pt,
+    leftrule = 0.5pt, rightrule = 0.5pt
+]{}}{\end{tcolorbox}}
+
+% Hanging indent
+\usepackage{hanging}
+
+% Enhanced list
+\usepackage{enumitem}
+\setitemize{noitemsep}
+\setenumerate{noitemsep}
+
+% Reset section number within part
+\usepackage{chngcntr}
+\counterwithin*{section}{part}
+
+% Footer
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf[FR]{\hyperlink{toc}{Return to Table of Contents}}
+
+% Table of contents title change
+\renewcommand{\contentsname}{Table of Contents}
+
+% Part and Subpart only
+\setcounter{tocdepth}{-1}
+
+\begin{document}
+\begin{titlepage}
+  \centering
+  \vspace*{1in}
+  {\fontsize{48pt}{\baselineskip}\selectfont \bfseries
+  \title}
+  \vfill
+
+  \Large
+  The Gwinnett School of Mathematics, Science, and Technology
+  Lawrenceville, Georgia
+
+  \vspace{0.5in}
+  \setstretch{1.5}\selectfont
+
+  \textbf{Team Leader} Yubo Cao 
+
+  \textbf{Partner} Vrishabh Doshi
+
+  \textbf{Teacher} Ms.~Newcomb Thompson \& Ms.~Calhoun
+\end{titlepage}
+\tableofcontents
+\newpage
+
+\include{directions-and-tips}
+\include{brainstorming}
+\addtocontents{toc}{\protect\hypertarget{toc}{}}
+\part{Research}
+\include{research/fundamentals-of-ship-hydrodynamics}
+\include{research/iitc-model-procedure}
+\include{research/hydrodynamic-optimization}
+\include{research/understanding-basics}
+\include{research/autodesk}
+\include{research/comprehensive-test}
+
+\include{research/iitc-resistance-test}
+\part{Reflection}
+\include{reflection}
+\include{initial-proposal}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+\include{initial-research}
+\include{experiment-1}
+\include{experiment-2}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+\include{data}
+\include{statistical}
+\include{result}
+ 
+\nocite{*}
+\printbibliography
+
+\end{document} 
