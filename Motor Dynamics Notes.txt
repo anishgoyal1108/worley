@@ -1,0 +1,29 @@
+# Mr. Goli's Lesson on Motor Dynamics
+
+The relationship between torque and rpm is inverse
+
+Free speed is when there is no load
+
+When you put more load, it puts more torque and draws an excessive amount of power until you reach the stall torque
+
+If you want to get more torque out of a motor to gear heavy things, you have to gear it down (that's where gear boxes come in)
+
+Gear boxes allow you to get more torque out of a motor while decreasing the rpm you get out of it
+
+A motor curve swhows you the amount of power consumed at the rpm its spinning at 
+The apex of the graph is where yoiou'll get the maximum output: you want to aim for that all the time
+
+You want to get as many motors of higher wattage as you can to do something, since you could be handling beefy equipment
+
+Torque = force x radius
+The more power you have, the more force you can exert for a smaller area. (or rather, torque)
+Let's assume that our motor here is the driving force and assume that we have a mass that ius like 25 pounds. 
+
+Just multiply the normal force times the idstance to get the torque! 
+
+You can always combine multiple motors with a gearbox.
+
+Stat rby trying to find the torque numbers on the motor (You want double the amount the stall load)
+
+There's a page that has a table with all the values you need a and a little curve
+
