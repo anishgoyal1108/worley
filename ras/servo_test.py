@@ -1,9 +1,8 @@
+from time import sleep
+
+import numpy as np
 from gpiozero import Servo
 from gpiozero.pins.pigpio import PiGPIOFactory
-from time import sleep
-from guizero import App, Slider, Text
-import numpy as np
-
 
 factory = PiGPIOFactory(host="192.168.137.191")
 servo = Servo(
