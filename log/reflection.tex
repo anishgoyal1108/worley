@@ -1,27 +1,25 @@
 \reflection{7/1/2023}{Anish Goyal}
 
-For our Governor's Honors Program final engineering project, we wanted to create an innovative device that could improve the lives of others. Our best friend, Cory, suffers from hearing loss and has to use hearing aids or sign language to communicate properly. This inspired us to create an application that signs out the American Sign Language alphabet using a mechanical robot hand from voice input in real time. We pitched the idea to our engineering instructors, and they were skeptical on how we would be able to achieve ten DoF within two weeks, and we knew we would have to prove them wrong. 
+For our \href{https://gosa.georgia.gov/governors-honors-program}{\gls{gosa} \gls{ghp}} final engineering project, we wanted to create an innovative device that could improve the lives of others. Our best friend, Cory, suffers from hearing loss and has to use hearing aids or sign language to communicate properly. This inspired us to create an application that signs out the \gls{asl} alphabet using a mechanical robot hand from voice input in real time.
 
-The first challenge we faced was the skepticism from our engineering instructors regarding our ability to achieve ten degrees of freedom (DoF) within a tight timeframe of two weeks. However, this skepticism only fueled our determination to prove them wrong. We were aware that we needed to push the boundaries of our knowledge and explore innovative technologies to bring our idea to life.
+Even though it's the first day, we have already faced skepticism from our engineering instructors regarding our ability to achieve ten \gls{dof} within a tight timeframe of two weeks. However, this skepticism has only fueled our determination to prove them wrong.
 
-To accomplish our goal, we delved into various technologies and concepts that transformed our learning process and made a significant impact on our project's success. Let's discuss some of these transformative elements:
+Here is some of the stuff we came up with during our brainstorming session today:
+\begin{description}
+\item[Pybluez] This Python library allowed us to establish a Bluetooth connection between our mobile application and the robot hand. It provided an interface to communicate and control the hand's movements seamlessly.
 
-Expo: We utilized Expo, a framework built on top of React Native, to streamline the development of our mobile application. Expo provided us with a powerful set of tools and libraries, enabling rapid prototyping and cross-platform deployment.
+\item[RPI GPIO programming] To interface with the robot hand, we leveraged \gls{rpi}'s \gls{gpio} pins. By connecting our servos to pins, we will be able to control the hand's actuators and enable precise finger movements.
 
-Pybluez: This Python library allowed us to establish a Bluetooth connection between our mobile application and the robot hand. It provided an interface to communicate and control the hand's movements seamlessly.
+\item[UDP and Custom audio transmission protocol] We want to implement \gls{udp} to transmit audio data from the mobile application to the signal processing module. We could also design a custom audio transmission protocol to ensure efficient and reliable data transfer.
 
-RPI GPIO programming: To interface with the robot hand, we leveraged Raspberry Pi's General-Purpose Input/Output (GPIO) pins. By programming these pins, we could control the hand's actuators and enable precise finger movements.
+\item[Zero-copy memory-efficient thread-safe asynchronous queue] This concept will help us optimize the data processing pipeline by minimizing memory overhead and ensuring thread safety. By utilizing an asynchronous queue, we can achieve efficient parallel processing of audio data.
 
-UDP and Custom audio transmission protocol: We implemented UDP (User Datagram Protocol) to transmit audio data from the mobile application to the signal processing module. We also designed a custom audio transmission protocol to ensure efficient and reliable data transfer.
+\item[Real time speech recognition through Whisper] We want to integrate cutting-edge techniques such as sliding window-based speech recognition and speaker diarization using the Whisper \gls{asr} model by OpenAI. Cutting the live audio into segments and feeding them into Whisper yields an accurate transcription of voice input with the illusion of real-time recognition.
 
-Zero-copy memory-efficient thread-safe asynchronous queue: This concept helped us optimize the data processing pipeline by minimizing memory overhead and ensuring thread safety. By utilizing an asynchronous queue, we achieved efficient and parallel processing of audio data.
+\item[Kubeflow-powered ML operations] We want to employ Kubeflow, a \gls{ml} toolkit for Kubernetes, to build a robust \gls{ml} pipeline. With Kubeflow, we can ensure data provenance, making it possible to trace and understand the entire ML workflow.
 
-Sliding window-based, VAD-powered, real-time, sentence-lagging speech recognition and speaker diarization through Whisper: We integrated cutting-edge techniques such as sliding window-based speech recognition and speaker diarization using the Whisper ASR (Automatic Speech Recognition) system. These advanced capabilities enabled real-time and accurate transcription of voice input.
-
-Kubeflow-powered ML pipeline with data provenance, discoverability, reproducibility: We employed Kubeflow, a machine learning (ML) toolkit for Kubernetes, to build a robust ML pipeline. With Kubeflow, we ensured data provenance, making it possible to trace and understand the entire ML workflow. It also enhanced discoverability and reproducibility, allowing for seamless collaboration and experimentation.
-
-Ray cluster-powered hyperparameter tuning: We harnessed Ray, an open-source framework, for distributed computing to optimize our ML models. By leveraging Ray clusters, we accelerated hyperparameter tuning, enabling us to fine-tune our models effectively.
-
+[Ray cluster-powered hyperparameter tuning] Using Ray, an open-source framework for distributed computing to optimize our ML models, will greatly accelerate the process of hyperparameter tuning, enabling better feature recognition and extraction.
+\end{description}
 \newpage
 
 \reflection{7/3/2023}{Yubo Cao}
