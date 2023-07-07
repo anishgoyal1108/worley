@@ -80,6 +80,7 @@ config:
       middle: 180
       ring: 180
       small: 0
+      palm: 0
     J:
       thumb: 90
       index: 180
@@ -87,6 +88,7 @@ config:
       middle: 180
       ring: 180
       small: 0
+      palm: 0
     K:
       thumb: 90
       palm: 180

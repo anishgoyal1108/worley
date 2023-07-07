@@ -25,6 +25,24 @@
         },
         "palm": {
           "type": "integer"
+        },
+        "precedence": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z]$"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z]$"
+                }
+              }
+            ]
+          }
         }
       },
       "required": [
@@ -93,7 +111,6 @@
       },
       "required": [
         "words",
-        "transitions",
         "servos"
       ]
     }

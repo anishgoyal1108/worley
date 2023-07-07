@@ -33,11 +33,12 @@ def load_config():
 class ServoController:
     """Controls the servos."""
 
-    def __init__(self, config):
+    def __init__(self, config, host="192.168.137.66"):
         log.info("Initializing controller...")
         self.config = config
 
         self.word = None
+        self._factory = PiGPIOFactory(host=host)
         self._transitions = self._load_transitions()
         self._servos = self._load_servos()
         self._words = self.config["words"]
@@ -83,13 +84,11 @@ class ServoController:
             max_angle=180,
             min_pulse_width=0.0005,
             max_pulse_width=0.0025,
-            pin_factory=factory,
+            pin_factory=self._factory,
         )
         return {name: make_servo(pin) for name, pin in self.config["servos"].items()}
 
 
-factory = PiGPIOFactory(host="192.168.137.66")
 config = load_config()
 controller = ServoController(config)
-
 controller.act("A")
