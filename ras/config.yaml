@@ -1,6 +1,14 @@
-version: v0.0.0
+version: v0.0.2
 config:
-  finger:
+  servos:
+    thumb: 2
+    index: 3
+    index_shift: 4
+    middle: 17
+    ring: 27
+    small: 22
+    palm: 10
+  words:
     A:
       thumb: 0
       index: 0
@@ -12,7 +20,7 @@ config:
   transitions:
     - from: A
       to: B
-      animation: 
+      steps: 
         - thumb: 0
           index: 0
           index_shift: 0

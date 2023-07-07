@@ -1,58 +1,105 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "object",
-    "definitions": {
-        "servo_config": {
-            "type": "object",
-            "patternProperties": {
-              "^[A-Za-z]$": {
-                "type": "object",
-                "properties": {
-                  "thumb": { "type": "integer" },
-                  "index": { "type": "integer" },
-                  "index_shift": { "type": "integer" },
-                  "middle": { "type": "integer" },
-                  "ring": { "type": "integer" },
-                  "small": { "type": "integer" },
-                  "palm": { "type": "integer" }
-                },
-                "required": ["thumb", "index", "index_shift", "middle", "ring", "small", "palm"]
-              }
-            }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "definitions": {
+    "servo_config": {
+      "type": "object",
+      "properties": {
+        "thumb": {
+          "type": "integer"
+        },
+        "index": {
+          "type": "integer"
+        },
+        "index_shift": {
+          "type": "integer"
+        },
+        "middle": {
+          "type": "integer"
+        },
+        "ring": {
+          "type": "integer"
+        },
+        "small": {
+          "type": "integer"
+        },
+        "palm": {
+          "type": "integer"
         }
-    },
-    "properties": {
-      "version": {
-        "type": "string",
-        "pattern": "^v\\d+\\.\\d+\\.\\d+$"
       },
-      "config": {
-        "type": "object",
-        "properties": {
-          "finger": {
-            "$ref": "#/definitions/servo_config"
-          },
-          "transitions": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "from": { "type": "string", "pattern": "^[A-Za-z]$" },
-                "to": { "type": "string", "pattern": "^[A-Za-z]$" },
-                "animation": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/servo_config"
-                  }
-                }
-              },
-              "required": ["from", "to", "animation"]
+      "required": [
+        "thumb",
+        "index",
+        "index_shift",
+        "middle",
+        "ring",
+        "small",
+        "palm"
+      ]
+    }
+  },
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^v\\d+\\.\\d+\\.\\d+$"
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "servos": {
+          "type": "object",
+          "patternProperties": {
+            "^[A-Za-z]$": {
+              "type": "integer",
+              "description": "Servo PIN"
             }
           }
         },
-        "required": ["finger", "transitions"]
-      }
-    },
-    "required": ["version", "config"]
-  }
-  
+        "words": {
+          "type": "object",
+          "patternProperties": {
+            "^[A-Za-z]+$": {
+              "$ref": "#/definitions/servo_config"
+            }
+          }
+        },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "pattern": "^[A-Za-z]$"
+              },
+              "to": {
+                "type": "string",
+                "pattern": "^[A-Za-z]$"
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/servo_config"
+                }
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "steps"
+            ]
+          }
+        }
+      },
+      "required": [
+        "words",
+        "transitions",
+        "servos"
+      ]
+    }
+  },
+  "required": [
+    "version",
+    "config"
+  ]
+}
