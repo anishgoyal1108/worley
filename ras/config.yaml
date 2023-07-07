@@ -17,14 +17,3 @@ config:
       ring: 0
       small: 0
       palm: 0
-  transitions:
-    - from: A
-      to: B
-      steps: 
-        - thumb: 0
-          index: 0
-          index_shift: 0
-          middle: 0
-          ring: 0
-          small: 0
-          palm: 0
