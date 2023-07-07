@@ -9,6 +9,117 @@ config:
     small: 22
     palm: 10
   words:
+    A:
+      thumb: 180
+      index: 180
+      index_shift: 90
+      middle: 180
+      ring: 180
+      small: 180
+      palm: 0
+    B:
+      thumb: 135
+      index: 0
+      index_shift: 90
+      middle: 0
+      ring: 0
+      small: 0
+      palm: 0
+    C:
+      thumb: 45
+      index: 90
+      index_shift: 90
+      middle: 90
+      ring: 90
+      small: 90
+      palm: 0
+    D:
+      thumb: 135
+      index: 0
+      index_shift: 90
+      middle: 135
+      ring: 135
+      small: 135
+      palm: 45
+    E:
+      thumb: 180
+      index: 135
+      index_shift: 90
+      middle: 135
+      ring: 135
+      small: 135
+      palm: 0
+    F:
+      thumb: 45
+      index: 135
+      index_shift: 90
+      middle: 0
+      ring: 0
+      small: 0
+      palm: 45
+    G:
+      thumb: 30
+      index: 0
+      index_shift: 90
+      middle: 180
+      ring: 180
+      small: 180
+      palm: 180
+    H:
+      thumb: 90
+      palm: 180
+      index: 0
+      index_shift: 20
+      middle: 180
+      ring: 180
+      small: 180
+    I:
+      thumb: 90
+      index: 180
+      index_shift: 0
+      middle: 180
+      ring: 180
+      small: 0
+    J:
+      thumb: 90
+      index: 180
+      index_shift: 0
+      middle: 180
+      ring: 180
+      small: 0
+    K:
+      thumb: 90
+      palm: 180
+      index: 0
+      # TODO: can we get more realistic index_shift?
+      index_shift: 0
+      middle: 0
+      ring: 180
+      small: 180
+    L:
+      thumb: 45
+      index: 0
+      index_shift: 0
+      palm: 0
+      middle: 180
+      ring: 180
+      small: 180
+    M:
+      thumb: 180
+      index: 180
+      index_shift: 0
+      middle: 180
+      ring: 180
+      small: 180
+      palm: 10
+    N:
+      thumb: 180
+      index: 145
+      index_shift: 0
+      middle: 145
+      ring: 180
+      small: 180
+      palm: 10
     Z:
       thumb: 135
       index: 0
