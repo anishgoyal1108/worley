@@ -3,6 +3,9 @@
 % For Unicode support
 \usepackage{xeCJK}
 
+% Title sec
+\usepackage{titlesec}
+
 % APA Citation
 \usepackage[
   style           = apa,
@@ -52,11 +55,11 @@
 % Customized reflection entry
 \newcounter{reflection}
 \newcommand{\reflection}[2]{\stepcounter{reflection} %
-  \section{Reflection \#\thereflection} 
+\section*{Reflection \#\thereflection}
+  %\noindent Log what you have done, what you have discovered, what you have learned, what are your next steps\ldots 
 
-  \paragraph{Date} #1
+\paragraph{Date} #1
 
-  % \noindent Log what you have done, what you have discovered, what you have learned, what are your next steps\ldots 
   \vspace*{-0.5cm}
 \paragraph{Initials} #2}
 
@@ -80,9 +83,9 @@
 % Float
 \usepackage{newfloat}
 
-% 1.15 line spacing
+% 1.5 line spacing
 \usepackage{setspace}
-\setstretch{1.5}
+\setstretch{2.0}
 
 % Subfigure
 \usepackage{subcaption}
@@ -144,7 +147,18 @@
 \newacronym{asl}{ASL}{American Sign Language}
 % gosa
 \newacronym{gosa}{GOSA}{Georgia Office of Student Achievement}
-
+% cad
+\newacronym{cad}{CAD}{computer-aided design}
+% sd
+\newacronym{sd}{SD}{speaker diarization}
+% vad
+\newacronym{vad}{VAD}{voice activation detection}
+% stt
+\newacronym{stt}{STT}{speech-to-text}
+% mvp
+\newacronym{mvp}{MVP}{minimum viable product}
+% cs
+\newacronym{cs}{CS}{computer science}
 % Table of contents title change
 \renewcommand{\contentsname}{Table of Contents}
 
