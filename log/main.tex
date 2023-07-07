@@ -123,6 +123,23 @@
 \pagestyle{fancy}
 \fancyhf[FR]{\hyperlink{toc}{Return to Table of Contents}}
 
+% Glossary acronym
+\usepackage[acronym]{glossaries}
+\makenoidxglossaries
+% dof
+\newacronym{dof}{DoF}{degrees of freedom}
+% ghp
+\newacronym{ghp}{GHP}{Governor's Honors Program}
+% rpi
+\newacronym{rpi}{RPI}{Raspberry Pi}
+% gpio
+\newacronym{gpio}{GPIO}{General Purpose Input/Output}
+% udp
+\newacronym{udp}{UDP}{User Datagram Protocol}
+% asr
+\newacronym{asr}{ASR}{Automatic Speech Recognition}
+% ml
+\newacronym{ml}{ML}{Machine Learning}
 % Table of contents title change
 \renewcommand{\contentsname}{Table of Contents}
 
@@ -179,6 +196,12 @@
 \include{result}
  
 \nocite{*}
+
+% print glossary
+\printnoidxglossary[type=\acronymtype,title=Acronyms]
+\newpage
+
+% print bibliography
 \printbibliography
 
 \end{document} 
