@@ -11,9 +11,3 @@ servo = AngularServo(
     max_pulse_width=0.0025,
     pin_factory=factory,
 )
-
-while True:
-    servo.angle = 0
-    sleep(1)
-    servo.angle = 180
-    sleep(1)
