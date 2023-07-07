@@ -10,11 +10,10 @@ jobs:
             - name: Set up Python 3.10
               uses: actions/setup-python@v2
               with:
-                  python-version: 3.10
-            - name: Install dependencies
-              run: |
-                  python -m pip install --upgrade pip
-                  pip install pygments
+                  python-version: "3.10"
+                  cache: "pip"
+            - name: Install pygments
+              run: sudo apt-get install python3-pygments
             - name: Compile LaTeX
               uses: xu-cheng/latex-action@v2
               with:
