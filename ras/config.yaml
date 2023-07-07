@@ -9,11 +9,99 @@ config:
     small: 22
     palm: 10
   words:
-    A:
-      thumb: 0
+    Z:
+      thumb: 135
+      index: 0
+      index_shift: 90
+      middle: 180
+      ring: 180
+      small: 180
+      palm: 90
+    Y:
+      thumb: 45
+      index: 180
+      index_shift: 0
+      middle: 180
+      ring: 180
+      small: 100
+      palm: 0
+    X:
+      thumb: 130
+      index: 90
+      index_shift: 0
+      middle: 180
+      ring: 180
+      small: 180
+      palm: 10
+    W:
+      thumb: 135
       index: 0
       index_shift: 0
       middle: 0
       ring: 0
-      small: 0
+      small: 180
+      palm: 15
+    V:
+      thumb: 120
+      index: 0
+      index_shift: 0
+      middle: 0
+      ring: 180
+      small: 180
+      palm: 15
+    U:
+      thumb: 120
+      index: 0
+      index_shift: 0
+      middle: 0
+      ring: 180
+      small: 180
+      palm: 15
+    T:
+      thumb: 110
+      index: 180
+      index_shift: 50
+      middle: 180
+      ring: 180
+      small: 180
+      palm: 5
+    S:
+      thumb: 120
+      index: 180
+      index_shift: 0
+      middle: 180
+      ring: 180
+      small: 180
+      palm: 15
+    R:
+      thumb: 120
+      index: 0
+      index_shift: 100
+      middle: 0
+      ring: 180
+      small: 180
+      palm: 15
+    Q:
+      thumb: 0
+      index: 0
+      index_shift: 0
+      middle: 180
+      ring: 180
+      small: 180
       palm: 0
+    P:
+      thumb: 10
+      index: 0
+      index_shift: 0
+      middle: 0
+      ring: 180
+      small: 180
+      palm: 5
+    O:
+      thumb: 90
+      index: 90
+      index_shift: 0
+      middle: 90
+      ring: 90
+      small: 90
+      palm: 180
