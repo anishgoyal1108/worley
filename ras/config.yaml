@@ -1,13 +1,13 @@
 version: v0.0.2
 config:
   servos:
-    thumb: 2
-    index: 3
-    index_shift: 4
-    middle: 17
-    ring: 27
-    small: 22
-    palm: 10
+    thumb: 0
+    index: 1
+    index_shift: 2
+    middle: 3
+    ring: 4
+    small: 5
+    palm: 6
   words:
     A:
       thumb: 180
