@@ -6,8 +6,7 @@ from pathlib import Path
 from time import sleep
 
 import yaml
-from gpiozero import AngularServo
-from gpiozero.pins.pigpio import PiGPIOFactory
+from adafruit_servokit import ServoKit
 from jsonschema import validate
 from rich import print
 from rich.logging import RichHandler
@@ -33,12 +32,11 @@ def load_config():
 class ServoController:
     """Controls the servos."""
 
-    def __init__(self, config, host="192.168.137.66"):
+    def __init__(self, config):
         log.info("Initializing controller...")
         self.config = config
 
         self.word = None
-        self._factory = PiGPIOFactory(host=host)
         self._transitions = self._load_transitions()
         self._servos = self._load_servos()
         self._words = self.config["words"]
@@ -47,7 +45,7 @@ class ServoController:
         log.debug(f"Acting out {word}...")
         try:
             self._transition(self.word, word)
-        except TypeError:
+        except ValueError:
             ...
         try:
             self._act_raw(self._words[word])
@@ -65,6 +63,8 @@ class ServoController:
             (from_, to),
             self._transitions.get((to, from_)),
         )
+        if transition is None:
+            raise ValueError(f"Invalid transition: {from_} -> {to}")
         for step in transition["steps"]:
             self._act_raw(step)
             sleep(dt)
@@ -78,15 +78,10 @@ class ServoController:
 
     def _load_servos(self):
         log.info("Initializing servos...")
-        make_servo = partial(
-            AngularServo,
-            min_angle=0,
-            max_angle=180,
-            min_pulse_width=0.0005,
-            max_pulse_width=0.0025,
-            pin_factory=self._factory,
-        )
-        return {name: make_servo(pin) for name, pin in self.config["servos"].items()}
+        self._kit = ServoKit(channels=16)
+        return {
+            name: self._kit.servo[pin] for name, pin in self.config["servos"].items()
+        }
 
 
 config = load_config()
