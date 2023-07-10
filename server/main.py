@@ -1,37 +1,88 @@
-import base64
-from logging import INFO, basicConfig, debug, info
+import asyncio
+import uuid
+from logging import getLogger, basicConfig, DEBUG
 
-from flask import Flask, jsonify, request
-from models import load_speech_to_text, load_vad
+from aiohttp import web
+from aiortc import RTCPeerConnection, RTCSessionDescription
+from aiortc.contrib.media import MediaRelay
+from rich.logging import RichHandler
 
-basicConfig(level=INFO)
+app = web.Application()
+router = web.RouteTableDef()
 
-app = Flask(__name__)
-speech_to_text = load_speech_to_text()
-vad = load_vad()
+basicConfig(level=DEBUG)
+log = getLogger(__name__)
+log.addHandler(RichHandler())
+log.setLevel("DEBUG")
 
-
-@app.route("/asr/handshake", methods=["POST"])
-def session():
-    data = request.json
-    if not data:
-        return jsonify({"error": "No data"}), 400
-    session_id = str(len(sessions))
-    sessions[session_id] = {"interval": data.get("interval", 500)}
-    return jsonify({"session_id": session_id})
+RELAY = MediaRelay()
+pcs = set()
 
 
-@app.route("/asr/recognize", methods=["POST"])
-def recognize():
-    data = request.json
-    if not data or "audio" not in data:
-        return jsonify({"error": "No audio data"}), 400
+@router.get("/ping")
+async def ping(request):
+    log.info(f"ping from {request.remote}")
+    return web.json_response({"message": "pong"})
 
-    audio = _load_audio(
-        base64.b64decode(data["audio"]),
-        data["format"],
+
+async def create_pc() -> tuple[RTCPeerConnection, str]:
+    pc = RTCPeerConnection()
+    pc_id = "PeerConnection(%s)" % uuid.uuid4()
+    pcs.add(pc)
+    return pc, pc_id
+
+
+@router.post("/offer")
+async def offer(request):
+    param = await request.json()
+    offer = RTCSessionDescription(sdp=param["sdp"], type=param["type"])
+
+    pc, pc_id = await create_pc()
+
+    def info(msg, *args):
+        log.info(pc_id + " " + msg, *args)
+
+    info("Created for %s", request.remote)
+
+    @pc.on("datachannel")
+    def on_datachannel(channel):
+        @channel.on("message")
+        def on_message(message):
+            info("Data channel message: %s", message)
+            channel.send("pong")
+
+    @pc.on("iceconnectionstatechange")
+    async def on_iceconnectionstatechange():
+        info("ICE connection state is %s", pc.iceConnectionState)
+        if pc.iceConnectionState == "failed":
+            await pc.close()
+
+    @pc.on("track")
+    def on_track(track):
+        info("Track %s received", track.kind)
+        pc.addTrack(track)
+        if track.kind != "audio":
+            return
+
+    await pc.setRemoteDescription(offer)
+    answer = await pc.createAnswer()
+    await pc.setLocalDescription(answer)  # type: ignore
+
+    return web.json_response(
+        {
+            "sdp": pc.localDescription.sdp,
+            "type": pc.localDescription.type,
+        }
     )
-    audio_queue.put(audio)
 
 
-app.run(host="0.0.0.0", debug=True)
+async def on_shutdown(app):
+    coros = [pc.close() for pc in pcs]
+    await asyncio.gather(*coros)
+    pcs.clear()
+
+
+if __name__ == "__main__":
+    app.add_routes(router)
+    app.on_shutdown.append(on_shutdown)
+    web.run_app(app)

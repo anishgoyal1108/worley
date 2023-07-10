@@ -14,6 +14,7 @@ export const Settings = () => {
   });
   const controller = new AbortController();
   function abort() {
+    if (serverStatus.status === 'connected') return;
     if (serverStatus.status === 'connecting') {
       controller.abort();
       setServerStatus({
@@ -29,10 +30,11 @@ export const Settings = () => {
       status: 'connecting',
       message: 'Connecting to server...',
     });
-    setCheckingServer(false);
-    setTimeout(() => abort(), 1000);
+    if (!checkingServer) return;
+    const timeout = setTimeout(() => abort(), 1000);
     fetch(`http://${settings.server}/ping`, { signal })
       .then((response) => {
+        clearTimeout(timeout);
         if (response.ok) {
           setServerStatus({
             status: 'connected',
@@ -67,6 +69,9 @@ export const Settings = () => {
           message: msg,
         });
       });
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [checkingServer, settings.server]);
 
   return (
@@ -83,6 +88,7 @@ export const Settings = () => {
             <Switch
               value={settings.theme === 'dark'}
               onValueChange={(value: boolean) => {
+                setCheckingServer(true);
                 setSettings({ ...settings, theme: value ? 'dark' : 'light' });
               }}
             />

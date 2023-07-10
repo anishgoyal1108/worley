@@ -5,13 +5,13 @@ import { RTCPeerConnection, RTCSessionDescription } from 'react-native-webrtc';
 import tw from 'twrnc';
 
 import { Audio } from 'expo-av';
+
 import { useSettings } from '@model';
 
 export function Main() {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [peerConnection, setPeerConnection] =
-    useState<RTCPeerConnection | null>(null);
+  const [pc, setPC] = useState<RTCPeerConnection | null>(null);
   const [settings, _] = useSettings();
 
   useEffect(() => {

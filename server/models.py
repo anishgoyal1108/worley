@@ -1,8 +1,11 @@
 from logging import info
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import numpy as np
 import torch
 import whisper
+import ffmpeg
 
 
 def load_speech_to_text(model_size: str = "tiny"):
@@ -18,7 +21,7 @@ def load_speech_to_text(model_size: str = "tiny"):
 
 
 def load_vad():
-    info("Loading sliero...")
+    info("Loading Sliero...")
     model, utils = torch.hub.load(
         repo_or_dir="snakers4/silero-vad",
         model="silero_vad",
@@ -30,4 +33,4 @@ def load_vad():
     def vad(audio: np.ndarray):
         return get_speech_ts(audio, model=model, sampling_rate=16000)
 
-    return vad
+    return model, vad
