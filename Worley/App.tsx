@@ -5,6 +5,8 @@ import { RecoilRoot } from 'recoil';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 
+import { StatusBar } from 'expo-status-bar';
+
 import { Ionicons } from '@expo/vector-icons';
 import { useSettings } from '@model';
 import { DarkColorScheme, LightColorScheme, Main, Settings } from '@view';
@@ -22,6 +24,7 @@ function AppContent() {
 
   return (
     <PaperProvider theme={customTheme}>
+      <StatusBar style={settings.theme === 'dark' ? 'light' : 'dark'} />
       {/* NOTE: React Navigation is still using MD2 paper types */}
       <NavigationContainer theme={customTheme as any}>
         <Navigator>
