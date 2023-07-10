@@ -3,9 +3,9 @@ import { atom, useRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type SettingsType = {
-  theme: String;
-  language: String;
-  server: String;
+  theme: string;
+  language: string;
+  server: string;
 };
 
 const Settings = atom<SettingsType>({
