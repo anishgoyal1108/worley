@@ -34,6 +34,8 @@ async def create_pc() -> tuple[RTCPeerConnection, str]:
 
 @router.post("/offer")
 async def offer(request):
+    log.info(f"offer from {request.remote}")
+
     param = await request.json()
     offer = RTCSessionDescription(sdp=param["sdp"], type=param["type"])
 

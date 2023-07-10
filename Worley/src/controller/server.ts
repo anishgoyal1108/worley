@@ -2,13 +2,10 @@ export function fetch_server(server: string, url: string, data: RequestInit) {
   if (url[0] !== '/') {
     url = '/' + url;
   }
-  return fetch(server + url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
+  if (!server.startsWith('http')) {
+    server = 'http://' + server;
+  }
+  return fetch(server + url, data);
 }
 
 export function post_json(server: string, url: string, data: any) {

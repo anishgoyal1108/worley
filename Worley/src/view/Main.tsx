@@ -10,7 +10,6 @@ import {
   RTCView,
   ScreenCapturePickerView,
   mediaDevices,
-  registerGlobals,
 } from 'react-native-webrtc';
 import tw from 'twrnc';
 
@@ -35,6 +34,7 @@ export function Main() {
         },
       ],
     });
+    console.debug('Creating offer...');
     var offer = await pc.createOffer({
       ordered: true,
       offerToReceiveAudio: true,
@@ -44,29 +44,31 @@ export function Main() {
     pc.onicecandidate = (event) => {
       const evt = event as RTCPeerConnectionIceEvent;
       if (evt.candidate) {
-        console.log('candidate', evt.candidate);
+        console.debug('Find ICE candidate...', evt.candidate);
       }
     };
 
-    while (true) {
-      if (pc.iceGatheringState === 'complete') {
-        console.log('ICE gathering complete');
-        break;
-      }
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
+    // console.debug('Wait for ICE gathering complete...');
+    // while (true) {
+    //   if (pc.iceGatheringState === 'complete') {
+    //     console.debug('ICE gathering complete');
+    //     break;
+    //   }
+    //   await new Promise((resolve) => setTimeout(resolve, 100));
+    // }
 
+    console.debug('Figure out codec...');
     offer = pc.localDescription as RTCSessionDescription;
     var codec = offer.sdp?.match(/m=audio .*\r\n.*\r\n/);
-    if (!codec) {
-      throw new Error('No codec found');
-    }
+    codec = codec ? codec[0] : 'default';
 
+    console.debug('Send offer to server...');
     const response = await post_offer(settings.server, {
       sdp: offer.sdp,
       type: offer.type,
     });
 
+    console.debug('Received answer from server...');
     const answer = new RTCSessionDescription({
       sdp: response.sdp,
       type: response.type,
@@ -106,17 +108,17 @@ export function Main() {
   };
 
   const startRecording = async () => {
+    setIsRecording(true);
     await createAudioStream();
     await createPeerConnection();
     await startAudioStream();
-    setIsRecording(true);
   };
 
   const stopRecording = async () => {
     await stopAudioStream();
+    setIsRecording(false);
     peerConnection?.close();
     setPeerConnection(null);
-    setIsRecording(false);
   };
 
   return (
