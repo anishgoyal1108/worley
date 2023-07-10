@@ -1,11 +1,8 @@
-import { useSettings } from '@model';
-
-export function fetch_server(url: string, data: RequestInit) {
-  const [settings, _] = useSettings();
+export function fetch_server(server: string, url: string, data: RequestInit) {
   if (url[0] !== '/') {
     url = '/' + url;
   }
-  return fetch(settings.server + url, {
+  return fetch(server + url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -14,8 +11,8 @@ export function fetch_server(url: string, data: RequestInit) {
   });
 }
 
-export function post_json(url: string, data: any) {
-  return fetch_server(url, {
+export function post_json(server: string, url: string, data: any) {
+  return fetch_server(server, url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -35,8 +32,9 @@ export type ServerOfferPayload = {
 };
 
 export async function post_offer(
+  server: string,
   data: ServerOfferPayload,
 ): Promise<ServerOfferResponse> {
-  const res = await post_json('offer', data);
+  const res = await post_json(server, 'offer', data);
   return await res.json();
 }

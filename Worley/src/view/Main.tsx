@@ -15,6 +15,7 @@ import {
 import tw from 'twrnc';
 
 import { post_offer } from '@controller';
+import { useSettings } from '@model';
 
 export function Main() {
   const [isRecording, setIsRecording] = useState(false);
@@ -24,6 +25,7 @@ export function Main() {
     null,
   );
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [settings, setSettings] = useSettings();
 
   const createPeerConnection = async () => {
     const pc = new RTCPeerConnection({
@@ -60,7 +62,7 @@ export function Main() {
       throw new Error('No codec found');
     }
 
-    const response = await post_offer({
+    const response = await post_offer(settings.server, {
       sdp: offer.sdp,
       type: offer.type,
     });
