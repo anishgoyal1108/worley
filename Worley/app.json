@@ -29,6 +29,9 @@
     },
     "experiments": {
       "tsconfigPaths": true
-    }
+    },
+    "plugins": [
+      "@config-plugins/react-native-webrtc"
+    ]
   }
 }
