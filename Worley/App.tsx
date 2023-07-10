@@ -15,15 +15,15 @@ function AppContent() {
 
   let theme = settings.theme === 'dark' ? MD3DarkTheme : MD3LightTheme;
   let colors = settings.theme === 'dark' ? DarkColorScheme : LightColorScheme;
+  let customTheme = {
+    ...theme,
+    colors,
+  };
 
   return (
-    <PaperProvider
-      theme={{
-        ...theme,
-        colors,
-      }}
-    >
-      <NavigationContainer>
+    <PaperProvider theme={customTheme}>
+      {/* NOTE: React Navigation is still using MD2 paper types */}
+      <NavigationContainer theme={customTheme as any}>
         <Navigator>
           <Screen
             name="Main"

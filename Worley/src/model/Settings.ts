@@ -4,7 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type SettingsType = {
   theme: string;
-  language: string;
   server: string;
 };
 
@@ -12,7 +11,6 @@ const Settings = atom<SettingsType>({
   key: 'Settings',
   default: {
     theme: 'light',
-    language: 'en',
     server: '192.168.6.1',
   },
 });
