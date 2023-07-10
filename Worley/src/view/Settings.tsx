@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar, View } from 'react-native';
-import { Button, List, Surface, Switch, TextInput } from 'react-native-paper';
+import {
+  Appbar,
+  Button,
+  List,
+  Surface,
+  Switch,
+  TextInput,
+} from 'react-native-paper';
 import tw from 'twrnc';
 
 import { useServerStatus, useSettings } from '@model';
@@ -74,11 +81,10 @@ export const Settings = () => {
   }, [checkingServer, settings.server]);
 
   return (
-    <Surface
-      style={tw`flex h-full justify-center items-center`}
-      elevation={1}
-      mode="flat"
-    >
+    <Surface style={tw`flex h-full`} elevation={1} mode="flat">
+      <Appbar.Header>
+        <Appbar.Content title="Settings" />
+      </Appbar.Header>
       <List.Section style={tw`w-full`}>
         <List.Subheader>Theme</List.Subheader>
         <List.Item

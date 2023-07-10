@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
-import { IconButton, Surface } from 'react-native-paper';
+import { Appbar, IconButton, Surface } from 'react-native-paper';
 import {
   MediaStream,
   MediaStreamTrack,
@@ -14,17 +14,15 @@ import {
 import tw from 'twrnc';
 
 import { post_offer } from '@controller';
-import { useSettings } from '@model';
+import { useServerStatus, useSettings } from '@model';
 
 export function Main() {
   const [isRecording, setIsRecording] = useState(false);
-  const [peerConnection, setPeerConnection] =
-    useState<RTCPeerConnection | null>(null);
-  const [textDataChannel, setTextDataChannel] = useState<RTCDataChannel | null>(
-    null,
-  );
+  const [PC, setPC] = useState<RTCPeerConnection | null>(null);
+  const [textDC, setTextDC] = useState<RTCDataChannel | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [settings, setSettings] = useSettings();
+  const settings = useSettings()[0],
+    status = useServerStatus()[0];
 
   const createPeerConnection = async () => {
     const pc = new RTCPeerConnection({
@@ -70,7 +68,7 @@ export function Main() {
     });
     await pc.setRemoteDescription(answer);
 
-    setPeerConnection(pc);
+    setPC(pc);
   };
 
   const createAudioStream = async () => {
@@ -89,7 +87,7 @@ export function Main() {
   const startAudioStream = async () => {
     const audioTracks = localStream?.getAudioTracks();
     audioTracks?.forEach((track) => {
-      peerConnection?.addTrack(track, localStream as MediaStream);
+      PC?.addTrack(track, localStream as MediaStream);
     });
   };
 
@@ -112,15 +110,15 @@ export function Main() {
   const stopRecording = async () => {
     await stopAudioStream();
     setIsRecording(false);
-    peerConnection?.close();
-    setPeerConnection(null);
+    PC?.close();
+    setPC(null);
   };
 
   return (
     <Surface style={tw`flex h-full`} elevation={1} mode="flat">
-      <Surface style={tw`h-16 justify-center px-4`}>
-        <Text style={tw`text-2xl text-slate-600`}>Worley</Text>
-      </Surface>
+      <Appbar.Header>
+        <Appbar.Content title="Worley" />
+      </Appbar.Header>
       <View style={tw`flex-1 justify-center items-center`}>
         <IconButton
           icon={isRecording ? 'stop' : 'microphone'}
