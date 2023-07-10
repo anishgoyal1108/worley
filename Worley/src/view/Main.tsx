@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
-import { Appbar, IconButton, Surface } from 'react-native-paper';
+import { Appbar, IconButton, Surface, useTheme } from 'react-native-paper';
 import {
   MediaStream,
-  MediaStreamTrack,
-  RTCIceCandidate,
   RTCPeerConnection,
   RTCSessionDescription,
-  RTCView,
-  ScreenCapturePickerView,
   mediaDevices,
 } from 'react-native-webrtc';
 import tw from 'twrnc';
 
 import { post_offer } from '@controller';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useServerStatus, useSettings } from '@model';
 
 export function Main() {
@@ -22,7 +19,8 @@ export function Main() {
   const [textDC, setTextDC] = useState<RTCDataChannel | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const settings = useSettings()[0],
-    status = useServerStatus()[0];
+    status = useServerStatus()[0],
+    theme = useTheme();
 
   const createPeerConnection = async () => {
     const pc = new RTCPeerConnection({
@@ -114,21 +112,48 @@ export function Main() {
     setPC(null);
   };
 
+  const recordingScreen = () => (
+    <View style={tw`flex-1 justify-center items-center`}>
+      <IconButton
+        icon={isRecording ? 'stop' : 'microphone'}
+        size={64}
+        onPress={isRecording ? stopRecording : startRecording}
+        mode="contained-tonal"
+        animated={true}
+        style={tw`w-28 h-28 rounded-full`}
+      />
+    </View>
+  );
+  const warningScreen = () => {
+    return (
+      <View style={tw`flex-1 justify-center items-center`}>
+        <MaterialIcons name="error" size={64} color={theme.colors.error} />
+        <Text
+          style={{
+            ...tw`text-xl`,
+            color: theme.colors.error,
+          }}
+        >
+          Server is not connected.
+        </Text>
+        <Text
+          style={{
+            ...tw`text-xl`,
+            color: theme.colors.error,
+          }}
+        >
+          Please check your settings.
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <Surface style={tw`flex h-full`} elevation={1} mode="flat">
       <Appbar.Header>
         <Appbar.Content title="Worley" />
       </Appbar.Header>
-      <View style={tw`flex-1 justify-center items-center`}>
-        <IconButton
-          icon={isRecording ? 'stop' : 'microphone'}
-          size={64}
-          onPress={isRecording ? stopRecording : startRecording}
-          mode="contained-tonal"
-          animated={true}
-          style={tw`w-28 h-28 rounded-full`}
-        />
-      </View>
+      {(status.status === 'connected' && recordingScreen()) || warningScreen()}
     </Surface>
   );
 }
