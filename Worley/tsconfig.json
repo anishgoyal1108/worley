@@ -15,6 +15,9 @@
       "@view": [
         "./src/view"
       ],
+      "@controller": [
+        "./src/controller"
+      ],
     }
   }
 }

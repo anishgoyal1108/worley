@@ -1,22 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import { IconButton, Surface } from 'react-native-paper';
 import {
   MediaStream,
+  MediaStreamTrack,
+  RTCIceCandidate,
   RTCPeerConnection,
   RTCSessionDescription,
+  RTCView,
+  ScreenCapturePickerView,
   mediaDevices,
+  registerGlobals,
 } from 'react-native-webrtc';
-import { post_offer } from 'src/controller/server';
 import tw from 'twrnc';
 
-import { useSettings } from '@model';
+import { post_offer } from '@controller';
 
 export function Main() {
   const [isRecording, setIsRecording] = useState(false);
-  const [pc, setPC] = useState<RTCPeerConnection | null>(null);
+  const [peerConnection, setPeerConnection] =
+    useState<RTCPeerConnection | null>(null);
+  const [textDataChannel, setTextDataChannel] = useState<RTCDataChannel | null>(
+    null,
+  );
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [settings, _] = useSettings();
 
   const createPeerConnection = async () => {
     const pc = new RTCPeerConnection({
@@ -64,13 +71,17 @@ export function Main() {
     });
     await pc.setRemoteDescription(answer);
 
-    setPC(pc);
+    setPeerConnection(pc);
   };
 
   const createAudioStream = async () => {
     try {
-      const stream = await mediaDevices.getUserMedia({ audio: true });
-      setLocalStream(stream);
+      const mediaStream = await mediaDevices.getUserMedia({ audio: true });
+      const tracks = mediaStream.getVideoTracks();
+      tracks.forEach((track) => {
+        track.enabled = false;
+      });
+      setLocalStream(mediaStream);
     } catch (err) {
       console.error('Failed to create audio stream', err);
     }
@@ -78,12 +89,9 @@ export function Main() {
 
   const startAudioStream = async () => {
     const audioTracks = localStream?.getAudioTracks();
-    if (audioTracks && audioTracks.length > 0 && localStream) {
-      const sender = pc?.addTrack(audioTracks[0], localStream);
-      if (sender) {
-        console.log('Added audio track to peer connection');
-      }
-    }
+    audioTracks?.forEach((track) => {
+      peerConnection?.addTrack(track, localStream as MediaStream);
+    });
   };
 
   const stopAudioStream = async () => {
@@ -104,6 +112,8 @@ export function Main() {
 
   const stopRecording = async () => {
     await stopAudioStream();
+    peerConnection?.close();
+    setPeerConnection(null);
     setIsRecording(false);
   };
 

@@ -9,6 +9,7 @@ module.exports = function (api) {
           alias: {
             '@view': './src/view',
             '@model': './src/model',
+            '@controller': './src/controller',
           },
           extensions: ['.ts', '.tsx'],
         },
