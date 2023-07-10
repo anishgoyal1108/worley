@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { IconButton, Surface } from 'react-native-paper';
+import { RTCPeerConnection, RTCSessionDescription } from 'react-native-webrtc';
 import tw from 'twrnc';
 
 import { Audio } from 'expo-av';
+import { useSettings } from '@model';
 
 export function Main() {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [peerConnection, setPeerConnection] =
+    useState<RTCPeerConnection | null>(null);
+  const [settings, _] = useSettings();
 
   useEffect(() => {
     return () => {
