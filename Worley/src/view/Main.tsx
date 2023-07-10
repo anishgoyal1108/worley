@@ -1,54 +1,110 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { IconButton, Surface } from 'react-native-paper';
-import { RTCPeerConnection, RTCSessionDescription } from 'react-native-webrtc';
+import {
+  MediaStream,
+  RTCPeerConnection,
+  RTCSessionDescription,
+  mediaDevices,
+} from 'react-native-webrtc';
+import { post_offer } from 'src/controller/server';
 import tw from 'twrnc';
-
-import { Audio } from 'expo-av';
 
 import { useSettings } from '@model';
 
 export function Main() {
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [pc, setPC] = useState<RTCPeerConnection | null>(null);
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [settings, _] = useSettings();
 
-  useEffect(() => {
-    return () => {
-      if (recording) {
-        recording.stopAndUnloadAsync();
+  const createPeerConnection = async () => {
+    const pc = new RTCPeerConnection({
+      iceServers: [
+        {
+          urls: 'stun:stun.l.google.com:19302',
+        },
+      ],
+    });
+    var offer = await pc.createOffer({
+      ordered: true,
+      offerToReceiveAudio: true,
+    });
+    await pc.setLocalDescription(offer);
+
+    pc.onicecandidate = (event) => {
+      const evt = event as RTCPeerConnectionIceEvent;
+      if (evt.candidate) {
+        console.log('candidate', evt.candidate);
       }
     };
-  }, [recording]);
 
-  const startRecording = async () => {
-    try {
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Permission to access audio was denied');
-        return;
+    while (true) {
+      if (pc.iceGatheringState === 'complete') {
+        console.log('ICE gathering complete');
+        break;
       }
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
 
-      const recording = new Audio.Recording();
-      await recording.prepareToRecordAsync(
-        Audio.RecordingOptionsPresets.HighQuality,
-      );
-      await recording.startAsync();
-      setRecording(recording);
-      setIsRecording(true);
+    offer = pc.localDescription as RTCSessionDescription;
+    var codec = offer.sdp?.match(/m=audio .*\r\n.*\r\n/);
+    if (!codec) {
+      throw new Error('No codec found');
+    }
+
+    const response = await post_offer({
+      sdp: offer.sdp,
+      type: offer.type,
+    });
+
+    const answer = new RTCSessionDescription({
+      sdp: response.sdp,
+      type: response.type,
+    });
+    await pc.setRemoteDescription(answer);
+
+    setPC(pc);
+  };
+
+  const createAudioStream = async () => {
+    try {
+      const stream = await mediaDevices.getUserMedia({ audio: true });
+      setLocalStream(stream);
     } catch (err) {
-      console.error('Failed to start recording', err);
+      console.error('Failed to create audio stream', err);
     }
   };
 
-  const stopRecording = async () => {
-    try {
-      await recording?.stopAndUnloadAsync();
-      setIsRecording(false);
-    } catch (err) {
-      console.error('Failed to stop recording', err);
+  const startAudioStream = async () => {
+    const audioTracks = localStream?.getAudioTracks();
+    if (audioTracks && audioTracks.length > 0 && localStream) {
+      const sender = pc?.addTrack(audioTracks[0], localStream);
+      if (sender) {
+        console.log('Added audio track to peer connection');
+      }
     }
+  };
+
+  const stopAudioStream = async () => {
+    try {
+      localStream?.getTracks().forEach((track) => track.stop());
+      setLocalStream(null);
+    } catch (err) {
+      console.error('Failed to stop audio stream', err);
+    }
+  };
+
+  const startRecording = async () => {
+    await createAudioStream();
+    await createPeerConnection();
+    await startAudioStream();
+    setIsRecording(true);
+  };
+
+  const stopRecording = async () => {
+    await stopAudioStream();
+    setIsRecording(false);
   };
 
   return (
