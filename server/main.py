@@ -1,10 +1,12 @@
 import asyncio
+import socket
 import uuid
-from logging import getLogger, basicConfig, DEBUG
+from logging import DEBUG, basicConfig, getLogger
 
 from aiohttp import web
 from aiortc import RTCPeerConnection, RTCSessionDescription
 from aiortc.contrib.media import MediaRelay
+from rich import print
 from rich.logging import RichHandler
 
 app = web.Application()
@@ -12,8 +14,18 @@ router = web.RouteTableDef()
 
 basicConfig(level=DEBUG)
 log = getLogger(__name__)
-log.addHandler(RichHandler())
-log.setLevel("DEBUG")
+
+
+def setup_logger(logger):
+    logger.setLevel("INFO")
+    logger.handlers.clear()
+    logger.addHandler(RichHandler())
+
+
+setup_logger(log)
+setup_logger(getLogger("aiortc"))
+setup_logger(getLogger("aioice"))
+
 
 RELAY = MediaRelay()
 pcs = set()
@@ -48,7 +60,7 @@ async def offer(request):
 
     @pc.on("datachannel")
     def on_datachannel(channel):
-        @channel.on("message")
+        @channel.on("text")
         def on_message(message):
             info("Data channel message: %s", message)
             channel.send("pong")
@@ -85,6 +97,7 @@ async def on_shutdown(app):
 
 
 if __name__ == "__main__":
+    print(f"Server started at http://{socket.gethostbyname(socket.gethostname())}:8080")
     app.add_routes(router)
     app.on_shutdown.append(on_shutdown)
     web.run_app(app)

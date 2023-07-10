@@ -10,73 +10,21 @@ import {
 } from 'react-native-paper';
 import tw from 'twrnc';
 
-import { useServerStatus, useSettings } from '@model';
+import { useServerStatus, useServerStatusUpdater, useSettings } from '@model';
 
 export const Settings = () => {
-  const [settings, setSettings] = useSettings();
   const [checkingServer, setCheckingServer] = useState(false);
-  const [serverStatus, setServerStatus] = useServerStatus();
-
-  const controller = new AbortController();
-  function abort() {
-    if (serverStatus.status === 'connected') return;
-    if (serverStatus.status === 'connecting') {
-      controller.abort();
-      setServerStatus({
-        status: 'disconnected',
-        message: 'Check server timed out',
-      });
-    }
-  }
+  const [settings, setSettings] = useSettings();
+  const [serverStatus, _] = useServerStatus();
+  const [abort, updateServerStatus] = useServerStatusUpdater();
 
   useEffect(() => {
-    const signal = controller.signal;
-    setServerStatus({
-      status: 'connecting',
-      message: 'Connecting to server...',
-    });
     if (!checkingServer) return;
     setCheckingServer(false);
-    const timeout = setTimeout(() => abort(), 1000);
-    fetch(`http://${settings.server}/ping`, { signal })
-      .then((response) => {
-        clearTimeout(timeout);
-        if (response.ok) {
-          setServerStatus({
-            status: 'connected',
-            message: 'Server is connected',
-          });
-        } else {
-          try {
-            response.json().then((json) => {
-              setServerStatus({
-                status: 'disconnected',
-                message: json.message,
-              });
-            });
-          } catch (error: any) {
-            setServerStatus({
-              status: 'disconnected',
-              message:
-                (error.hasOwnProperty('message') && error.message) ||
-                'Internal server error',
-            });
-          }
-        }
-      })
-      .catch((error) => {
-        if (error.name === 'AbortError') return;
-        let msg = error.message;
-        if (error.message === 'Network request failed') {
-          msg = 'Server is not connected';
-        }
-        setServerStatus({
-          status: 'disconnected',
-          message: msg,
-        });
-      });
+    const timeout = updateServerStatus();
     return () => {
       clearTimeout(timeout);
+      abort();
     };
   }, [checkingServer, settings.server]);
 

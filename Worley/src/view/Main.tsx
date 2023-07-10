@@ -52,6 +52,7 @@ export function Main() {
     offer = pc.localDescription as RTCSessionDescription;
     var codec = offer.sdp?.match(/m=audio .*\r\n.*\r\n/);
     codec = codec ? codec[0] : 'default';
+    console.debug('Codec:', codec);
 
     console.debug('Send offer to server...');
     const response = await post_offer(settings.server, {
@@ -66,7 +67,16 @@ export function Main() {
     });
     await pc.setRemoteDescription(answer);
 
-    setPC(pc);
+    return pc;
+  };
+
+  const stopPeerConnection = async (PC: RTCPeerConnection) => {
+    try {
+      PC.close();
+      setPC(null);
+    } catch (err) {
+      console.error('Failed to stop peer connection', err);
+    }
   };
 
   const createAudioStream = async () => {
@@ -76,20 +86,56 @@ export function Main() {
       tracks.forEach((track) => {
         track.enabled = false;
       });
-      setLocalStream(mediaStream);
+      return mediaStream;
     } catch (err) {
       console.error('Failed to create audio stream', err);
     }
   };
 
-  const startAudioStream = async () => {
+  const createTextDC = async (PC: RTCPeerConnection) => {
+    const dc = PC.createDataChannel('text', {
+      ordered: true,
+    }) as unknown as RTCDataChannel;
+    if (dc === null) {
+      console.error('Failed to create text data channel');
+      return;
+    }
+    dc.addEventListener('open', () => {
+      console.debug('Text data channel opened');
+    });
+    dc.addEventListener('message', (event) => {
+      const evt = event as MessageEvent;
+      console.debug('Text data channel message received', evt.data);
+    });
+    dc.addEventListener('close', () => {
+      console.debug('Text data channel closed');
+    });
+    dc.addEventListener('error', (err) => {
+      console.error('Text data channel error', err);
+    });
+    return dc;
+  };
+
+  const stopTextDC = async (textDC: RTCDataChannel) => {
+    try {
+      textDC?.close();
+      setTextDC(null);
+    } catch (err) {
+      console.error('Failed to stop text data channel', err);
+    }
+  };
+
+  const startAudioStream = async (
+    PC: RTCPeerConnection,
+    localStream: MediaStream,
+  ) => {
     const audioTracks = localStream?.getAudioTracks();
     audioTracks?.forEach((track) => {
       PC?.addTrack(track, localStream as MediaStream);
     });
   };
 
-  const stopAudioStream = async () => {
+  const stopAudioStream = async (localStream: MediaStream) => {
     try {
       localStream?.getTracks().forEach((track) => track.stop());
       setLocalStream(null);
@@ -100,16 +146,25 @@ export function Main() {
 
   const startRecording = async () => {
     setIsRecording(true);
-    await createAudioStream();
-    await createPeerConnection();
-    await startAudioStream();
+    const stream = (await createAudioStream())!!;
+    setLocalStream(stream);
+    const pc = await createPeerConnection();
+    setPC(pc);
+    const tdc = (await createTextDC(pc))!!;
+    setTextDC(tdc);
+    await startAudioStream(pc, stream);
+    textDC?.send('Hello world!');
   };
 
-  const stopRecording = async () => {
-    await stopAudioStream();
+  const stopRecording = async (
+    PC: RTCPeerConnection,
+    localStream: MediaStream,
+    textDC: RTCDataChannel,
+  ) => {
+    await stopAudioStream(localStream);
+    await stopTextDC(textDC);
+    await stopPeerConnection(PC);
     setIsRecording(false);
-    PC?.close();
-    setPC(null);
   };
 
   const recordingScreen = () => (
@@ -117,13 +172,18 @@ export function Main() {
       <IconButton
         icon={isRecording ? 'stop' : 'microphone'}
         size={64}
-        onPress={isRecording ? stopRecording : startRecording}
+        onPress={
+          isRecording
+            ? () => stopRecording(PC!!, localStream!!, textDC!!)
+            : startRecording
+        }
         mode="contained-tonal"
         animated={true}
         style={tw`w-28 h-28 rounded-full`}
       />
     </View>
   );
+
   const warningScreen = () => {
     return (
       <View style={tw`flex-1 justify-center items-center`}>
