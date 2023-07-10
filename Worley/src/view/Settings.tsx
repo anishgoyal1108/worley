@@ -3,15 +3,13 @@ import { StatusBar, View } from 'react-native';
 import { Button, List, Surface, Switch, TextInput } from 'react-native-paper';
 import tw from 'twrnc';
 
-import { useSettings } from '@model';
+import { useServerStatus, useSettings } from '@model';
 
 export const Settings = () => {
   const [settings, setSettings] = useSettings();
   const [checkingServer, setCheckingServer] = useState(false);
-  const [serverStatus, setServerStatus] = useState({
-    status: 'disconnected',
-    message: 'Server is not connected',
-  });
+  const [serverStatus, setServerStatus] = useServerStatus();
+
   const controller = new AbortController();
   function abort() {
     if (serverStatus.status === 'connected') return;
@@ -31,6 +29,7 @@ export const Settings = () => {
       message: 'Connecting to server...',
     });
     if (!checkingServer) return;
+    setCheckingServer(false);
     const timeout = setTimeout(() => abort(), 1000);
     fetch(`http://${settings.server}/ping`, { signal })
       .then((response) => {
