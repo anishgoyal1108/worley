@@ -5,6 +5,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export type SettingsType = {
   theme: string;
   server: string;
+  rtc: {
+    waitForICEGathering: boolean;
+  };
 };
 
 const Settings = atom<SettingsType>({
@@ -12,6 +15,9 @@ const Settings = atom<SettingsType>({
   default: {
     theme: 'light',
     server: '192.168.6.1',
+    rtc: {
+      waitForICEGathering: true,
+    },
   },
 });
 

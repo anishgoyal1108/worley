@@ -128,6 +128,23 @@ export const Settings = () => {
             </View>
           )}
         />
+
+        <List.Subheader>WebRTC</List.Subheader>
+        <List.Item
+          title="Wait for ICE"
+          description="Wait for ICE gathering complete before sending offer"
+          right={() => (
+            <Switch
+              value={settings.rtc.waitForICEGathering}
+              onValueChange={(value: boolean) => {
+                setSettings({
+                  ...settings,
+                  rtc: { ...settings.rtc, waitForICEGathering: value },
+                });
+              }}
+            />
+          )}
+        />
       </List.Section>
       <StatusBar />
     </Surface>

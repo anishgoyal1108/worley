@@ -48,14 +48,9 @@ export function Main() {
       }
     };
 
-    // console.debug('Wait for ICE gathering complete...');
-    // while (true) {
-    //   if (pc.iceGatheringState === 'complete') {
-    //     console.debug('ICE gathering complete');
-    //     break;
-    //   }
-    //   await new Promise((resolve) => setTimeout(resolve, 100));
-    // }
+    if (settings.rtc.waitForICEGathering) {
+      await waitForICEGathering(pc);
+    }
 
     console.debug('Figure out codec...');
     offer = pc.localDescription as RTCSessionDescription;
@@ -138,4 +133,14 @@ export function Main() {
       </View>
     </Surface>
   );
+}
+async function waitForICEGathering(pc: RTCPeerConnection) {
+  console.debug('Wait for ICE gathering complete...');
+  while (true) {
+    if (pc.iceGatheringState === 'complete') {
+      console.debug('ICE gathering complete');
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
 }
