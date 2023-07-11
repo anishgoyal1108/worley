@@ -24,7 +24,7 @@ def load_vad():
         model="silero_vad",
         force_reload=True,
     )
-    (get_speech_ts, _, _, _, _, _) = utils
+    (get_speech_ts, *_) = utils
     info("Sliero loaded.")
 
     def vad(audio: np.ndarray):
