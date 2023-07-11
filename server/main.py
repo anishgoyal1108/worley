@@ -62,8 +62,6 @@ async def offer(request):
         @channel.on("message")
         def on_message(message):
             info("Data channel message from %s: %s", channel.label, message)
-            if isinstance(message, str) and message.startswith("ping"):
-                channel.send("pong" + message[4:])
 
     @pc.on("connectionstatechange")
     async def on_connectionstatechange():

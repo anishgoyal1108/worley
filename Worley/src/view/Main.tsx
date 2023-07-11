@@ -14,14 +14,6 @@ function createPeerConnection() {
     iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }],
   });
 
-  // TODO: connect audio
-  // pc.addEventListener('track', function (event) {
-  //   const evt: RTCTrackEvent = event as RTCTrackEvent;
-  //   if (evt.track.kind == 'video')
-  //     document.getElementById('video').srcObject = evt.streams[0];
-  //   else document.getElementById('audio').srcObject = evt.streams[0];
-  // });
-
   return pc;
 }
 
@@ -79,34 +71,17 @@ function start(settings: SettingsType): [RTCPeerConnection, RTCDataChannel] {
 
   console.log('Created local peer connection object pc');
 
-  var time_start = -1;
-
-  function current_stamp() {
-    if (time_start === null) {
-      time_start = new Date().getTime();
-      return 0;
-    } else {
-      return new Date().getTime() - time_start;
-    }
-  }
-
   var parameters = { ordered: true };
-  var dcInterval: NodeJS.Timeout | null = null;
 
   const dc = pc.createDataChannel(
     'text',
     parameters,
   ) as unknown as RTCDataChannel;
 
-  dc.onclose = function () {
-    if (dcInterval) clearInterval(dcInterval);
-  };
   dc.onopen = function () {
-    dcInterval = setInterval(function () {
-      var message = 'ping ' + current_stamp();
-      dc.send(message);
-    }, 1000);
+    console.log('Data channel is open and ready to be used.');
   };
+
   dc.onmessage = function (evt) {
     console.log('Received message: ' + evt.data);
   };
