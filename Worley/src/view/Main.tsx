@@ -1,190 +1,181 @@
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
+import { Appbar, IconButton, Surface, useTheme } from 'react-native-paper';
 import {
-  Appbar,
-  Button,
-  IconButton,
-  Surface,
-  useTheme,
-} from 'react-native-paper';
-import {
-  MediaStream,
   RTCPeerConnection,
   RTCSessionDescription,
   mediaDevices,
 } from 'react-native-webrtc';
 import tw from 'twrnc';
 
-import { post_offer } from '@controller';
+import { post_json, post_offer } from '@controller';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useServerStatus, useSettings } from '@model';
+import { SettingsType, useServerStatus, useSettings } from '@model';
+
+function createPeerConnection() {
+  const pc = new RTCPeerConnection({
+    sdpSemantics: 'unified-plan',
+    iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }],
+  });
+
+  // TODO: connect audio
+  // pc.addEventListener('track', function (event) {
+  //   const evt: RTCTrackEvent = event as RTCTrackEvent;
+  //   if (evt.track.kind == 'video')
+  //     document.getElementById('video').srcObject = evt.streams[0];
+  //   else document.getElementById('audio').srcObject = evt.streams[0];
+  // });
+
+  return pc;
+}
+
+function negotiate(
+  pc: RTCPeerConnection,
+  server: string,
+  skip_ice: boolean = false,
+) {
+  console.log(`Negotiating with ${server}...`);
+  return pc
+    .createOffer(null)
+    .then(function (offer) {
+      return pc.setLocalDescription(offer);
+    })
+    .then(() => {
+      if (skip_ice) {
+        console.warn('Skipping ICE gathering');
+        return null;
+      }
+      new Promise(function (resolve) {
+        if (pc.iceGatheringState === 'complete') {
+          resolve(null);
+        } else {
+          function checkState() {
+            if (pc.iceGatheringState === 'complete') {
+              pc.removeEventListener('icegatheringstatechange', checkState);
+              resolve(null);
+            }
+          }
+          pc.addEventListener('icegatheringstatechange', checkState);
+        }
+      });
+    })
+    .then(function () {
+      var offer = pc.localDescription!!;
+
+      return fetch(`http://${server}/offer`, {
+        body: JSON.stringify({
+          sdp: offer.sdp,
+          type: offer.type,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      });
+    })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (answer) {
+      return pc.setRemoteDescription(answer);
+    })
+    .catch(function (e) {
+      alert(e);
+    });
+}
+
+function start(settings: SettingsType): [RTCPeerConnection, RTCDataChannel] {
+  const pc: RTCPeerConnection = createPeerConnection();
+
+  const server = settings.server;
+  const wait_ice = !settings.rtc.waitForICEGathering;
+
+  console.log('Created local peer connection object pc');
+
+  var time_start = -1;
+
+  function current_stamp() {
+    if (time_start === null) {
+      time_start = new Date().getTime();
+      return 0;
+    } else {
+      return new Date().getTime() - time_start;
+    }
+  }
+
+  var parameters = { ordered: true };
+  var dcInterval: NodeJS.Timeout | null = null;
+
+  const dc = pc.createDataChannel(
+    'text',
+    parameters,
+  ) as unknown as RTCDataChannel;
+
+  dc.onclose = function () {
+    if (dcInterval) clearInterval(dcInterval);
+  };
+  dc.onopen = function () {
+    dcInterval = setInterval(function () {
+      var message = 'ping ' + current_stamp();
+      dc.send(message);
+    }, 1000);
+  };
+  dc.onmessage = function (evt) {
+    console.log('Received message: ' + evt.data);
+  };
+
+  var constraints = {
+    audio: true,
+    video: false,
+  };
+
+  mediaDevices.getUserMedia(constraints).then(
+    (stream) => {
+      stream.getTracks().forEach(function (track) {
+        pc.addTrack(track, stream);
+      });
+      return negotiate(pc, server, wait_ice);
+    },
+    function (err) {
+      alert('Could not acquire media: ' + err);
+    },
+  );
+
+  return [pc, dc];
+}
+
+function stop(pc?: RTCPeerConnection, dc?: RTCDataChannel) {
+  dc?.close();
+  if (pc?.getReceivers()) {
+    pc?.getReceivers().forEach(function (receiver) {
+      receiver.track?.stop();
+    });
+  }
+  if (pc?.getSenders()) {
+    pc?.getSenders().forEach(function (sender) {
+      sender.track?.stop();
+    });
+  }
+  setTimeout(() => pc?.close(), 500);
+}
 
 export function Main() {
   const [isRecording, setIsRecording] = useState(false);
-  const [PC, setPC] = useState<RTCPeerConnection | null>(null);
-  const [textDC, setTextDC] = useState<RTCDataChannel | null>(null);
-  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const settings = useSettings()[0],
-    status = useServerStatus()[0],
+  const status = useServerStatus()[0],
+    settings = useSettings()[0],
     theme = useTheme();
-  const [textDCEstablished, setTextDCEstablished] = useState(false);
+  const [pc, setPC] = useState<RTCPeerConnection | null>(null);
+  const [dc, setDC] = useState<RTCDataChannel | null>(null);
 
-  const createPeerConnection = async () => {
-    const pc = new RTCPeerConnection({
-      sdpSemantics: 'unified-plan',
-      iceServers: [
-        {
-          urls: 'stun:stun.l.google.com:19302',
-        },
-      ],
-    });
-    console.debug('Creating offer...');
-    var offer = await pc.createOffer({
-      ordered: true,
-      offerToReceiveAudio: true,
-    });
-    await pc.setLocalDescription(offer);
-
-    pc.onicecandidate = (event) => {
-      const evt = event as RTCPeerConnectionIceEvent;
-      if (evt.candidate) {
-        console.debug('ICE candidate:', evt.candidate);
-      }
-    };
-
-    if (settings.rtc.waitForICEGathering) {
-      await waitForICEGathering(pc);
-    }
-
-    console.debug('Figure out codec...');
-    offer = pc.localDescription as RTCSessionDescription;
-    var codec = offer.sdp?.match(/m=audio .*\r\n.*\r\n/);
-    codec = codec ? codec[0] : 'default';
-    console.debug('Codec:', codec);
-
-    console.debug('Send offer to server...');
-    const response = await post_offer(settings.server, {
-      sdp: offer.sdp,
-      type: offer.type,
-    });
-
-    console.debug('Received answer from server...');
-    const answer = new RTCSessionDescription({
-      sdp: response.sdp,
-      type: response.type,
-    });
-    await pc.setRemoteDescription(answer);
-
-    return pc;
-  };
-
-  const stopPeerConnection = async (PC: RTCPeerConnection) => {
-    try {
-      PC.close();
-      setPC(null);
-    } catch (err) {
-      console.error('Failed to stop peer connection', err);
-    }
-  };
-
-  const createAudioStream = async () => {
-    try {
-      const mediaStream = await mediaDevices.getUserMedia({ audio: true });
-      const tracks = mediaStream.getVideoTracks();
-      tracks.forEach((track) => {
-        track.enabled = false;
-      });
-      return mediaStream;
-    } catch (err) {
-      console.error('Failed to create audio stream', err);
-    }
-  };
-
-  const createTextDC = async (
-    PC: RTCPeerConnection,
-    debug: boolean = false,
-  ) => {
-    console.debug('Creating text data channel...');
-    const dc = PC.createDataChannel('chat', {
-      ordered: true,
-    }) as unknown as RTCDataChannel;
-    if (dc === null) {
-      console.error('Failed to create text data channel');
-      return;
-    }
-    if (debug) {
-      dc.onopen = () => {
-        console.debug('Text data channel opened');
-        setTextDCEstablished(true);
-      };
-      dc.onclose = () => {
-        console.debug('Text data channel closed');
-        setTextDCEstablished(false);
-      };
-      dc.onerror = (err) => {
-        console.error('Text data channel error:', err);
-        setTextDCEstablished(false);
-      };
-      dc.onmessage = (event) => {
-        console.debug('Text data channel message:', event.data);
-        setTextDCEstablished(true);
-      };
-    }
-    return dc;
-  };
-
-  const stopTextDC = async (textDC: RTCDataChannel) => {
-    try {
-      textDC?.close();
-      setTextDC(null);
-    } catch (err) {
-      console.error('Failed to stop text data channel', err);
-    }
-  };
-
-  const startAudioStream = async (
-    PC: RTCPeerConnection,
-    localStream: MediaStream,
-  ) => {
-    console.log('Start audio stream');
-    const audioTracks = localStream.getAudioTracks();
-    audioTracks.forEach((track) => {
-      PC.addTrack(track, localStream as MediaStream);
-    });
-  };
-
-  const stopAudioStream = async (localStream: MediaStream) => {
-    try {
-      localStream?.getTracks().forEach((track) => track.stop());
-      setLocalStream(null);
-    } catch (err) {
-      console.error('Failed to stop audio stream', err);
-    }
-  };
-
-  const startRecording = async () => {
-    console.log('Start recording');
-    setIsRecording(true);
-    const stream = (await createAudioStream())!!;
-    setLocalStream(stream);
-    const pc = await createPeerConnection();
+  const startRecording = () => {
+    const [pc, dc] = start(settings);
     setPC(pc);
-    const tdc = (await createTextDC(pc))!!;
-    setTextDC(tdc);
-    // TODO: necessary to make TDC ready
-    setTimeout(() => tdc.send('Hello World'), 1000);
-    await startAudioStream(pc, stream);
+    setDC(dc);
+    setIsRecording(true);
   };
 
-  const stopRecording = async (
-    PC: RTCPeerConnection,
-    localStream: MediaStream,
-    textDC: RTCDataChannel,
-  ) => {
-    console.log('Stop recording');
-    await stopAudioStream(localStream);
-    await stopTextDC(textDC);
-    await stopPeerConnection(PC);
+  const stopRecording = () => {
+    stop(pc as RTCPeerConnection, dc as RTCDataChannel);
     setIsRecording(false);
   };
 
@@ -193,28 +184,14 @@ export function Main() {
       <IconButton
         icon={isRecording ? 'stop' : 'microphone'}
         size={64}
-        onPress={
-          isRecording
-            ? () => stopRecording(PC!!, localStream!!, textDC!!)
-            : startRecording
-        }
+        onPress={() => {
+          if (isRecording) stopRecording();
+          else startRecording();
+        }}
         mode="contained-tonal"
         animated={true}
         style={tw`w-28 h-28 rounded-full`}
       />
-      {textDCEstablished && (
-        <>
-          <Text>Text data channel is established.</Text>
-          <Button
-            onPress={() => {
-              console.log('Send message');
-              textDC!!.send('Hello World');
-            }}
-          >
-            Send
-          </Button>
-        </>
-      )}
     </View>
   );
 

@@ -49,10 +49,10 @@ async def offer(request):
     pc_id = "PeerConnection(%s)" % uuid.uuid4()
     pcs.add(pc)
 
-    def log_info(msg, *args):
+    def info(msg, *args):
         log.info(pc_id + " " + msg, *args)
 
-    log_info("Created for %s", request.remote)
+    info("Created for %s", request.remote)
 
     # prepare local media
     recorder = MediaRecorder(str("./test.wav"))
@@ -61,27 +61,28 @@ async def offer(request):
     def on_datachannel(channel):
         @channel.on("message")
         def on_message(message):
+            info("Data channel message from %s: %s", channel.label, message)
             if isinstance(message, str) and message.startswith("ping"):
                 channel.send("pong" + message[4:])
 
     @pc.on("connectionstatechange")
     async def on_connectionstatechange():
-        log_info("Connection state is %s", pc.connectionState)
+        info("Connection state is %s", pc.connectionState)
         if pc.connectionState == "failed":
             await pc.close()
             pcs.discard(pc)
 
     @pc.on("track")
     def on_track(track):
-        log_info("Track %s received", track.kind)
+        info("Track %s received", track.kind)
 
         if track.kind == "audio":
-            log_info("Adding track to recorder")
+            info("Adding track to recorder")
             recorder.addTrack(track)
 
         @track.on("ended")
         async def on_ended():
-            log_info("Track %s ended", track.kind)
+            info("Track %s ended", track.kind)
             await recorder.stop()
 
     # handle offer
