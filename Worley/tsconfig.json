@@ -12,11 +12,20 @@
       "@model": [
         "./src/model"
       ],
+      "@model/*": [
+        "./src/model/*"
+      ],
       "@view": [
         "./src/view"
       ],
+      "@view/*": [
+        "./src/view/*"
+      ],
       "@controller": [
         "./src/controller"
+      ],
+      "@controller/*": [
+        "./src/controller/*"
       ],
     }
   }
