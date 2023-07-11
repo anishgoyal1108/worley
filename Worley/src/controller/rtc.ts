@@ -58,7 +58,7 @@ function negotiate(
 }
 export function start(
   settings: SettingsType,
-): [RTCPeerConnection, RTCDataChannel] {
+): [RTCPeerConnection, RTCDataChannel, RTCDataChannel] {
   const pc: RTCPeerConnection = createPeerConnection();
 
   const server = settings.server;
@@ -68,18 +68,15 @@ export function start(
 
   var parameters = { ordered: true };
 
-  const dc = pc.createDataChannel(
+  const textDC = pc.createDataChannel(
     'speech_recognition',
     parameters,
   ) as unknown as RTCDataChannel;
 
-  dc.onopen = function () {
-    console.debug('Data channel is open and ready to be used.');
-  };
-
-  dc.onmessage = function (evt) {
-    console.debug('Received message: ' + evt.data);
-  };
+  const confidenceDC = pc.createDataChannel(
+    'confidence',
+    parameters,
+  ) as unknown as RTCDataChannel;
 
   var constraints = {
     audio: true,
@@ -98,10 +95,15 @@ export function start(
     },
   );
 
-  return [pc, dc];
+  return [pc, textDC, confidenceDC];
 }
-export function stop(pc?: RTCPeerConnection, dc?: RTCDataChannel) {
-  dc?.close();
+export function stop(
+  pc?: RTCPeerConnection,
+  tdc?: RTCDataChannel,
+  cdc?: RTCDataChannel,
+) {
+  tdc?.close();
+  cdc?.close();
   if (pc?.getReceivers()) {
     pc?.getReceivers().forEach(function (receiver) {
       receiver.track?.stop();

@@ -1,31 +1,54 @@
-from logging import info
+import contextlib
+import os
+from logging import getLogger
 
 import numpy as np
 import torch
-import whisper
+from faster_whisper import WhisperModel
+from rich.logging import RichHandler
+
+log = getLogger("models")
+log.addHandler(RichHandler())
+log.setLevel("INFO")
 
 
 def load_speech_to_text(model_size: str = "base"):
-    info("Loading whisper...")
-    model = whisper.load_model(model_size)
+    log.info("Loading whisper...")
+    device: str
     if torch.cuda.is_available():
-        model = model.to("cuda")
-        info("Using GPU.")
+        log.info("Using GPU.")
+        device = "cuda"
     else:
-        info("Using CPU.")
-    info("Whisper loaded.")
+        log.info("Using CPU.")
+        device = "cpu"
+    model = WhisperModel(
+        model_size,
+        device=device,
+        compute_type="float16",
+    )
+    log.info("Whisper loaded.")
 
     def transcribe(audio: np.ndarray):
-        return model.transcribe(audio)
+        segments, info = model.transcribe(
+            audio,
+            without_timestamps=True,
+            language="en",
+        )
+        return " ".join([segment.text for segment in segments])
 
     return transcribe
 
 
 def load_vad():
-    info("Loading Sliero...")
-    model, utils = torch.hub.load(repo_or_dir="snakers4/silero-vad", model="silero_vad")
+    log.info("Loading Sliero...")
+    with open(os.devnull, "w") as devnull:
+        with contextlib.redirect_stdout(devnull):
+            model, utils = torch.hub.load(
+                repo_or_dir="snakers4/silero-vad",
+                model="silero_vad",
+            )
     (get_speech_ts, *_) = utils
-    info("Sliero loaded.")
+    log.info("Sliero loaded.")
 
     def vad(audio: np.ndarray):
         return get_speech_ts(audio, model=model, sampling_rate=16000)

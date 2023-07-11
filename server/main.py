@@ -1,29 +1,31 @@
 import asyncio
 import socket
+import time
 import uuid
+from collections import deque
 from logging import getLogger
-import numpy as np
 
+import numpy as np
 from aiohttp import web
 from aiortc import RTCPeerConnection, RTCSessionDescription
 from aiortc.contrib.media import MediaRelay
 from models import load_speech_to_text
-from rtc import VADTrack
 from rich import print
 from rich.logging import RichHandler
-from collections import deque
+from rtc import VADTrack
 
 app = web.Application()
 router = web.RouteTableDef()
 
-log = getLogger(__name__)
+log = getLogger("main")
+speech_to_text = load_speech_to_text("base")
 
 
 def setup_logger(logger, quiet=False):
     if quiet:
         logger.setLevel("WARNING")
     else:
-        logger.setLevel("DEBUG")
+        logger.setLevel("INFO")
         logger.handlers.clear()
         logger.addHandler(RichHandler())
 
@@ -33,7 +35,6 @@ setup_logger(getLogger("aiortc"), quiet=True)
 setup_logger(getLogger("aioice"), quiet=True)
 
 pcs = set()  # NOTE: Maintain reference to peer connections to avoid garbage collection
-speech_to_text = load_speech_to_text()
 
 
 class Ref:
@@ -72,15 +73,17 @@ async def offer(request):
     info("Created for %s", request.remote)
 
     sr_dc = Ref(None)
+    conf_dc = Ref(None)
     queue = deque()
 
     def send_text(text: str):
         debug(f"Sending text: {text}")
-        if sr_dc.get() is not None:
-            sr_dc.get().send(text)
+        srdc = sr_dc.get()
+        if srdc is not None:
+            srdc.send(text)
             while len(queue):
                 text = queue.popleft()
-                sr_dc.send(text)
+                srdc.send(text)
         else:
             debug(f"Queueing text: {text}")
             queue.append(text)
@@ -93,6 +96,10 @@ async def offer(request):
         debug("Data channel created by remote party")
         if c.label == "speech_recognition":
             sr_dc.set(c)
+        elif c.label == "confidence":
+            conf_dc.set(c)
+        else:
+            info("Unknown data channel label: %s", c.label)
 
         @c.on("message")
         def on_message(message):
@@ -113,14 +120,22 @@ async def offer(request):
         if track.kind == "audio":
             info("Adding VADTrack")
 
+            async def confidence_callback(confidence: float):
+                log.debug(f"Sending confidence: {confidence}")
+                cdc = conf_dc.get()
+                if cdc is not None:
+                    cdc.send(str(confidence))
+
             async def vad_callback(audio: np.ndarray):
-                log.debug(f"Received audio: {audio.shape}")
-                result = speech_to_text(audio)
-                send_text(result["text"])
+                start = time.time()
+                text = speech_to_text(audio)
+                log.debug(f"Transcribed in {time.time() - start}s: {text}")
+                send_text(text)
 
             vad_track = VADTrack(
                 relay.subscribe(track),
                 speech_callback=vad_callback,
+                confidence_callback=confidence_callback,
             )
             vad_track.start()
 
@@ -128,7 +143,8 @@ async def offer(request):
         async def on_ended():
             info("Track %s ended", track.kind)
             track.stop()
-            vad_track.stop()
+            if vad_track is not None:
+                vad_track.stop()
 
     # handle offer
     await pc.setRemoteDescription(offer)

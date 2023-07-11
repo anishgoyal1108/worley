@@ -1,21 +1,18 @@
 import asyncio
 from collections.abc import Callable, Coroutine
 from logging import getLogger
-from pathlib import Path
 
 import numpy as np
 import torch
 from aiortc.mediastreams import MediaStreamError
 from av import AudioResampler
 from av.audio.frame import AudioFrame
+from models import load_vad
 from rich.logging import RichHandler
 
-from models import load_vad
-
-ROOT = Path(__file__).resolve().parent
-log = getLogger(__name__)
+log = getLogger("rtc")
 log.addHandler(RichHandler())
-log.setLevel("DEBUG")
+log.setLevel("INFO")
 
 
 class VADTrack:
@@ -26,26 +23,33 @@ class VADTrack:
         self,
         track,
         buffer_size=4096,
-        detection_window: int = 16,
-        overlap: int = 8,
+        detection_window: int = 8,
+        overlap: int = 4,
         min_speech_windows: int = 4,
+        min_silence_windows: int = 2,
         confidence_threshold: float = 0.45,
+        confidence_callback: Callable[[float], Coroutine[None, None, None]]
+        | None = None,
         speech_callback: Callable[[np.ndarray], Coroutine[None, None, None]]
         | None = None,
     ):
         super().__init__()
         self.track = track
-        self.buffer: list[AudioFrame] = []
+        self.buffer: list[AudioFrame] = list()
 
         self.buffer_size = buffer_size
-        self.speech_window = 0
         self.min_speech_windows = min_speech_windows
+        self.speech_window_count = 0
+        self.last_speech_window_count = 0
+        self.min_silence_windows = min_silence_windows
+        self.silence_window_count = 0
         self.confidence_threshold = confidence_threshold
         self.detection_window = detection_window
         self.speech_callback = speech_callback
+        self.confidence_callback = confidence_callback
 
-        self.confidence_pointer = 0
-        self.speech_pointer = 0
+        self.speech_end = 0
+        self.speech_start = 0
         self.overlap = overlap
 
         self.resampler = AudioResampler(
@@ -95,45 +99,60 @@ class VADTrack:
         audio = self.__to_float(audio)
         return audio
 
+    def __run(self, coro: Coroutine[None, None, None]):
+        task = asyncio.ensure_future(coro)
+        task.add_done_callback(lambda _: self.callback_tasks.remove(task))
+        self.callback_tasks.append(task)
+
     async def __process_one(self):
         try:
             frame: AudioFrame = await self.track.recv()
+            log.debug(f"Received a {frame.pts * 1000 / frame.sample_rate}ms frame")
             self.buffer.append(self.resampler.resample(frame)[0])
-        except MediaStreamError as e:
+        except MediaStreamError:
             return
 
         if len(self.buffer) > self.buffer_size:
             # TODO: Ring buffer
             self.buffer.pop(0)
-            self.confidence_pointer -= 1
-            self.speech_pointer -= 1
+            self.speech_end -= 1
+            self.speech_start -= 1
 
-        if len(self.buffer) - self.confidence_pointer >= self.detection_window:
-            start = self.confidence_pointer
-            end = self.confidence_pointer + self.detection_window
+        if len(self.buffer) - self.speech_end >= self.detection_window:
+            start = self.speech_end
+            end = self.speech_end + self.detection_window
             self.confidence = self.vad_model(
                 torch.from_numpy(self.__prepare_audio(start, end)),
                 self.SAMPLE_RATE,
             ).item()
-            self.confidence_pointer += self.detection_window - self.overlap
+            if self.confidence_callback is not None:
+                log.debug(f"Confidence: {self.confidence}")
+                self.__run(self.confidence_callback(self.confidence))
+            self.speech_end += self.detection_window - self.overlap
 
             if self.confidence > self.confidence_threshold:
-                self.speech_window += 1
+                if self.speech_window_count == 0:
+                    self.speech_start = self.speech_end
+                self.speech_window_count += 1
+                self.silence_window_count = 0
             else:
-                if self.speech_window > self.min_speech_windows:
+                if (
+                    self.last_speech_window_count > self.min_speech_windows
+                    and self.silence_window_count > self.min_silence_windows
+                ):
                     if self.speech_callback is not None:
-                        log.debug(f"Speech detected: [{self.speech_pointer, start})")
-                        task = asyncio.ensure_future(
+                        log.info(f"Speech detected: [{self.speech_start, start})")
+                        self.__run(
                             self.speech_callback(
                                 self.__prepare_audio(
-                                    self.speech_pointer,
+                                    self.speech_start,
                                     start,
                                 )
                             )
                         )
-                        task.add_done_callback(
-                            lambda _: self.callback_tasks.remove(task)
-                        )
-                        self.callback_tasks.append(task)
-                self.speech_window = 0
-                self.speech_pointer = self.confidence_pointer
+                    self.last_speech_window_count = 0
+
+                if self.silence_window_count == 0:
+                    self.last_speech_window_count = self.speech_window_count
+                self.speech_window_count = 0
+                self.silence_window_count += 1

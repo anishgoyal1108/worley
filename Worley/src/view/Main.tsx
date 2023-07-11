@@ -60,36 +60,40 @@ export function Main() {
     settings = useSettings()[0],
     theme = useTheme();
   const [pc, setPC] = useState<RTCPeerConnection | null>(null);
-  const [dc, setDC] = useState<RTCDataChannel | null>(null);
+  const [textDC, setTextDC] = useState<RTCDataChannel | null>(null);
+  const [confidenceDC, setConfidenceDC] = useState<RTCDataChannel | null>(null);
   const [message, setMessage] = useState('');
-  const [connectionStatus, setConnectionStatus] =
-    useState<StatusBoxType>('connecting');
+  const [confidence, setConfidence] = useState(-1);
 
   const startRecording = () => {
-    const [pc, dc] = start(settings);
+    const [pc, textDC, confidenceDC] = start(settings);
     setPC(pc);
-    setDC(dc);
+    setTextDC(textDC);
+    setConfidenceDC(confidenceDC);
 
-    dc.onopen = () => {
-      setConnectionStatus('connected');
-    };
-    dc.onmessage = (e) => {
-      console.log('Data channel message:', e.data);
+    textDC.onmessage = (e) => {
       setMessage(e.data);
     };
-    dc.onerror = (e) => {
-      console.error('Data channel error:', e);
-      setConnectionStatus('failed');
+
+    confidenceDC.onmessage = (e) => {
+      const data = parseFloat(e.data);
+      setConfidence(data);
     };
-    dc.onclose = () => {
-      setConnectionStatus('failed');
-    };
+
     setIsRecording(true);
+    setMessage('');
+    setConfidence(-1);
   };
 
   const stopRecording = () => {
-    stop(pc as RTCPeerConnection, dc as RTCDataChannel);
+    stop(
+      pc as RTCPeerConnection,
+      textDC as RTCDataChannel,
+      confidenceDC as RTCDataChannel,
+    );
     setIsRecording(false);
+    setConfidence(-1);
+    setMessage('');
   };
 
   const recordingScreen = () => (
@@ -110,6 +114,11 @@ export function Main() {
           {message}
         </Text>
       )}
+      {isRecording && confidence != -1 && (
+        <Text variant="labelLarge" style={tw`text-center`}>
+          {confidence}
+        </Text>
+      )}
     </View>
   );
 
@@ -119,7 +128,7 @@ export function Main() {
         <MaterialIcons name="error" size={64} color={theme.colors.error} />
         <Text
           style={{
-            ...tw`text-xl`,
+            ...tw`text-lg`,
             color: theme.colors.error,
           }}
         >
@@ -127,7 +136,7 @@ export function Main() {
         </Text>
         <Text
           style={{
-            ...tw`text-xl`,
+            ...tw`text-lg`,
             color: theme.colors.error,
           }}
         >
