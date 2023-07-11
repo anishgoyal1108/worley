@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
-import { Text, View } from 'react-native';
-import { Appbar, IconButton, Surface, useTheme } from 'react-native-paper';
+import { View } from 'react-native';
+import {
+  Appbar,
+  IconButton,
+  Surface,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 import { RTCPeerConnection } from 'react-native-webrtc';
 import tw from 'twrnc';
 
@@ -8,9 +14,49 @@ import { start, stop } from '@controller/rtc';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useServerStatus, useSettings } from '@model';
 
+type StatusBoxType = 'connected' | 'failed' | 'connecting';
+
+function StatusBox({
+  label,
+  status,
+  size = 24,
+}: {
+  label: string;
+  status: StatusBoxType;
+  size?: number;
+}) {
+  const theme = useTheme();
+  const color = {
+    connected: theme.colors.primary,
+    failed: theme.colors.error,
+    connecting: theme.colors.secondary,
+  };
+  const icon = {
+    connected: 'check',
+    failed: 'error',
+    connecting: 'sync',
+  };
+  return (
+    <View
+      key={label}
+      style={tw`flex-1 flex-row gap-2 justify-center items-center`}
+    >
+      <Text variant="labelLarge">{label}</Text>
+      {
+        <MaterialIcons
+          // TODO: Fix typing
+          name={icon[status] as any}
+          size={size}
+          color={color[status]}
+        />
+      }
+    </View>
+  );
+}
+
 export function Main() {
   const [isRecording, setIsRecording] = useState(false);
-  const status = useServerStatus()[0],
+  const serverStatus = useServerStatus()[0],
     settings = useSettings()[0],
     theme = useTheme();
   const [pc, setPC] = useState<RTCPeerConnection | null>(null);
@@ -73,7 +119,8 @@ export function Main() {
       <Appbar.Header>
         <Appbar.Content title="Worley" />
       </Appbar.Header>
-      {(status.status === 'connected' && recordingScreen()) || warningScreen()}
+      {(serverStatus.status === 'connected' && recordingScreen()) ||
+        warningScreen()}
     </Surface>
   );
 }
