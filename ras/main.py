@@ -1,15 +1,12 @@
 import json
 import logging
 import re
-from functools import partial
 from pathlib import Path
 from time import sleep
-from string import ascii_uppercase
 
 import yaml
 from jsonschema import validate
 from typing import Literal
-from rich import print
 from rich.logging import RichHandler
 
 log = logging.getLogger()
@@ -26,8 +23,74 @@ def load_config():
     with open(config_path, encoding="utf-8") as f:
         config = yaml.safe_load(f)
     validate(instance=config, schema=schema)
-    assert re.match(r"v0\.0\..*", config["version"]), "Invalid version"
+    assert re.match(r"v0\.1\..*", config["version"]), "Invalid version"
     return config["config"]
+
+
+class Servo:
+    def __init__(
+        self,
+        pin: int,
+        min: int = 0,
+        max: int = 180,
+        default: int = 0,
+        inverted: bool = False,
+        backend: Literal["adafruit", "gpiozero"] = "gpiozero",
+        host: str = "192.168.137.60",
+    ):
+        self.pin = pin
+        self.min = min
+        self.max = max
+        self.default = default
+        self.inverted = inverted
+        self.host = host
+        self.backend = backend
+
+        if backend == "adafruit":
+            if host != "localhost":
+                raise ValueError("Adafruit backend does not support remote hosts")
+            self._servo = self.__load_adafruit_servo()
+        else:
+            self._servo = self.__load_gpiozero_servo()
+        self.angle = default
+
+    @property
+    def angle(self):
+        return self._servo.angle
+
+    @angle.setter
+    def angle(self, value):
+        if self.inverted:
+            value = self.max - value + self.min
+        if self.backend == "gpiozero":
+            log.debug(f"Setting {self.pin} to {value}")
+            self._servo.angle = value
+        else:
+            angle = (value - self.min) / (self.max - self.min) * 180
+            angle = self.max - angle
+            angle = max(self.min, min(self.max, angle))
+            log.debug(f"Setting {self.pin} to {angle}")
+            self._servo.angle = angle
+
+    def __load_adafruit_servo(self):
+        from adafruit_servokit import ServoKit
+
+        kit = ServoKit(channels=16)
+        return kit.servo[self.pin]
+
+    def __load_gpiozero_servo(self):
+        from gpiozero import AngularServo
+        from gpiozero.pins.pigpio import PiGPIOFactory
+
+        factory = PiGPIOFactory(host=self.host)
+        return AngularServo(
+            pin=self.pin,
+            min_angle=self.min,
+            max_angle=self.max,
+            min_pulse_width=0.0005,
+            max_pulse_width=0.0025,
+            pin_factory=factory,
+        )
 
 
 class ServoController:
@@ -45,11 +108,24 @@ class ServoController:
         self.word = None
         self._host = host
         self._transitions = self._load_transitions()
-        if type == "adafruit":
-            self._servos = self._load_adafruit_servos()
-        else:
-            self._servos = self._load_gpiozero_servos()
+
+        log.info("Loading servos...")
+        self._servos = {
+            name: Servo(
+                **servo_config,
+                backend=type,
+                host=host,
+            )
+            if isinstance(servo_config, dict)
+            else Servo(pin=servo_config, backend=type, host=host)
+            for name, servo_config in self.config["servos"].items()
+        }
         self._words = self.config["words"]
+
+    def __getattr__(self, name):
+        if name in self._servos:
+            return self._servos[name]
+        raise AttributeError(f"Invalid attribute: {name}")
 
     def act(self, word: str):
         log.debug(f"Acting out {word}...")
@@ -89,36 +165,10 @@ class ServoController:
             for transition in self.config.get("transitions", [])
         }
 
-    def _load_adafruit_servos(self):
-        from adafruit_servokit import ServoKit
-
-        log.info("Initializing servos...")
-        self._kit = ServoKit(channels=16)
-        return {
-            name: self._kit.servo[pin]
-            for name, pin in self.config["servos"].items()
-            if pin in range(0, 15)  # support omitted servos
-        }
-
-    def _load_gpiozero_servos(self):
-        from gpiozero import AngularServo
-        from gpiozero.pins.pigpio import PiGPIOFactory
-
-        log.info("Initializing servos...")
-        self._factory = PiGPIOFactory(host=self._host)
-        make_servo = partial(
-            AngularServo,
-            min_angle=0,
-            max_angle=180,
-            min_pulse_width=0.0005,
-            max_pulse_width=0.0025,
-            pin_factory=self._factory,
-        )
-        return {name: make_servo(pin) for name, pin in self.config["servos"].items()}
-
 
 config = load_config()
 controller = ServoController(config)
 # for i in ascii_uppercase:
 #     controller.act(i)
 #     sleep(1)
+# controller.act("MIN")

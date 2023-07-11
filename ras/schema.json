@@ -2,29 +2,65 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "definitions": {
+    "servo": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "description": "Servo PIN"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "pin": {
+              "type": "integer",
+              "description": "Servo PIN"
+            },
+            "min": {
+              "type": "integer",
+              "description": "Minimum angle"
+            },
+            "max": {
+              "type": "integer",
+              "description": "Maximum angle"
+            },
+            "default": {
+              "type": "integer",
+              "description": "Default angle"
+            },
+            "inverted": {
+              "type": "boolean",
+              "description": "Invert angle"
+            }
+          },
+          "required": [
+            "pin"
+          ]
+        }
+      ]
+    },
     "servo_config": {
       "type": "object",
       "properties": {
         "thumb": {
-          "type": "integer"
+          "$ref": "#/definitions/servo"
         },
         "index": {
-          "type": "integer"
+          "$ref": "#/definitions/servo"
         },
         "index_shift": {
-          "type": "integer"
+          "$ref": "#/definitions/servo"
         },
         "middle": {
-          "type": "integer"
+          "$ref": "#/definitions/servo"
         },
         "ring": {
-          "type": "integer"
+          "$ref": "#/definitions/servo"
         },
         "small": {
-          "type": "integer"
+          "$ref": "#/definitions/servo"
         },
         "palm": {
-          "type": "integer"
+          "$ref": "#/definitions/servo"
         },
         "precedence": {
           "type": "array",

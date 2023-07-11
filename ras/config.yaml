@@ -1,11 +1,11 @@
-version: v0.0.2
+version: v0.1.0
 config:
   servos:
     thumb: 4
     index: 22
     index_shift: 2
     middle: 27
-    ring: 17
+    ring: { pin: 17, inverted: true }
     small: 4
     palm: 6
   words:
