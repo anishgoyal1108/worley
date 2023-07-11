@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
-import { Appbar, IconButton, Surface, useTheme } from 'react-native-paper';
+import {
+  Appbar,
+  Button,
+  IconButton,
+  Surface,
+  useTheme,
+} from 'react-native-paper';
 import {
   MediaStream,
   RTCPeerConnection,
@@ -21,9 +27,11 @@ export function Main() {
   const settings = useSettings()[0],
     status = useServerStatus()[0],
     theme = useTheme();
+  const [textDCEstablished, setTextDCEstablished] = useState(false);
 
   const createPeerConnection = async () => {
     const pc = new RTCPeerConnection({
+      sdpSemantics: 'unified-plan',
       iceServers: [
         {
           urls: 'stun:stun.l.google.com:19302',
@@ -40,7 +48,7 @@ export function Main() {
     pc.onicecandidate = (event) => {
       const evt = event as RTCPeerConnectionIceEvent;
       if (evt.candidate) {
-        console.debug('Find ICE candidate...', evt.candidate);
+        console.debug('ICE candidate:', evt.candidate);
       }
     };
 
@@ -92,27 +100,36 @@ export function Main() {
     }
   };
 
-  const createTextDC = async (PC: RTCPeerConnection) => {
-    const dc = PC.createDataChannel('text', {
+  const createTextDC = async (
+    PC: RTCPeerConnection,
+    debug: boolean = false,
+  ) => {
+    console.debug('Creating text data channel...');
+    const dc = PC.createDataChannel('chat', {
       ordered: true,
     }) as unknown as RTCDataChannel;
     if (dc === null) {
       console.error('Failed to create text data channel');
       return;
     }
-    dc.addEventListener('open', () => {
-      console.debug('Text data channel opened');
-    });
-    dc.addEventListener('message', (event) => {
-      const evt = event as MessageEvent;
-      console.debug('Text data channel message received', evt.data);
-    });
-    dc.addEventListener('close', () => {
-      console.debug('Text data channel closed');
-    });
-    dc.addEventListener('error', (err) => {
-      console.error('Text data channel error', err);
-    });
+    if (debug) {
+      dc.onopen = () => {
+        console.debug('Text data channel opened');
+        setTextDCEstablished(true);
+      };
+      dc.onclose = () => {
+        console.debug('Text data channel closed');
+        setTextDCEstablished(false);
+      };
+      dc.onerror = (err) => {
+        console.error('Text data channel error:', err);
+        setTextDCEstablished(false);
+      };
+      dc.onmessage = (event) => {
+        console.debug('Text data channel message:', event.data);
+        setTextDCEstablished(true);
+      };
+    }
     return dc;
   };
 
@@ -129,9 +146,10 @@ export function Main() {
     PC: RTCPeerConnection,
     localStream: MediaStream,
   ) => {
-    const audioTracks = localStream?.getAudioTracks();
-    audioTracks?.forEach((track) => {
-      PC?.addTrack(track, localStream as MediaStream);
+    console.log('Start audio stream');
+    const audioTracks = localStream.getAudioTracks();
+    audioTracks.forEach((track) => {
+      PC.addTrack(track, localStream as MediaStream);
     });
   };
 
@@ -145,6 +163,7 @@ export function Main() {
   };
 
   const startRecording = async () => {
+    console.log('Start recording');
     setIsRecording(true);
     const stream = (await createAudioStream())!!;
     setLocalStream(stream);
@@ -152,8 +171,9 @@ export function Main() {
     setPC(pc);
     const tdc = (await createTextDC(pc))!!;
     setTextDC(tdc);
+    // TODO: necessary to make TDC ready
+    setTimeout(() => tdc.send('Hello World'), 1000);
     await startAudioStream(pc, stream);
-    textDC?.send('Hello world!');
   };
 
   const stopRecording = async (
@@ -161,6 +181,7 @@ export function Main() {
     localStream: MediaStream,
     textDC: RTCDataChannel,
   ) => {
+    console.log('Stop recording');
     await stopAudioStream(localStream);
     await stopTextDC(textDC);
     await stopPeerConnection(PC);
@@ -181,6 +202,19 @@ export function Main() {
         animated={true}
         style={tw`w-28 h-28 rounded-full`}
       />
+      {textDCEstablished && (
+        <>
+          <Text>Text data channel is established.</Text>
+          <Button
+            onPress={() => {
+              console.log('Send message');
+              textDC!!.send('Hello World');
+            }}
+          >
+            Send
+          </Button>
+        </>
+      )}
     </View>
   );
 
@@ -217,13 +251,20 @@ export function Main() {
     </Surface>
   );
 }
-async function waitForICEGathering(pc: RTCPeerConnection) {
+
+function waitForICEGathering(pc: RTCPeerConnection) {
   console.debug('Wait for ICE gathering complete...');
-  while (true) {
+  return new Promise((resolve) => {
     if (pc.iceGatheringState === 'complete') {
-      console.debug('ICE gathering complete');
-      break;
+      resolve(null);
+    } else {
+      function checkState() {
+        if (pc.iceGatheringState === 'complete') {
+          pc.removeEventListener('icegatheringstatechange', checkState);
+          resolve(null);
+        }
+      }
+      pc.addEventListener('icegatheringstatechange', checkState);
     }
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
+  });
 }
