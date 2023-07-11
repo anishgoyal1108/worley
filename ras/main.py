@@ -33,11 +33,17 @@ def load_config():
 class ServoController:
     """Controls the servos."""
 
-    def __init__(self, config, type: Literal["adafruit", "gpiozero"] = "gpiozero"):
+    def __init__(
+        self,
+        config,
+        type: Literal["adafruit", "gpiozero"] = "gpiozero",
+        host: str = "192.168.137.60",
+    ):
         log.info("Initializing controller...")
         self.config = config
 
         self.word = None
+        self._host = host
         self._transitions = self._load_transitions()
         if type == "adafruit":
             self._servos = self._load_adafruit_servos()
@@ -62,7 +68,7 @@ class ServoController:
             if servo := self._servos.get(name):
                 servo.angle = angle
             else:
-                log.warning(f'Servo {name} is not supported')
+                log.warning(f"Servo {name} is not supported")
 
     def _transition(self, from_: str, to: str, dt=0.05):
         log.debug(f"Transitioning from {from_} to {to}...")
@@ -85,20 +91,21 @@ class ServoController:
 
     def _load_adafruit_servos(self):
         from adafruit_servokit import ServoKit
-                
+
         log.info("Initializing servos...")
         self._kit = ServoKit(channels=16)
         return {
-            name: self._kit.servo[pin] for name, pin in self.config["servos"].items()
-            if pin in range(0, 15) # support omitted servos
+            name: self._kit.servo[pin]
+            for name, pin in self.config["servos"].items()
+            if pin in range(0, 15)  # support omitted servos
         }
-    
+
     def _load_gpiozero_servos(self):
         from gpiozero import AngularServo
         from gpiozero.pins.pigpio import PiGPIOFactory
-        
+
         log.info("Initializing servos...")
-        self._factory = PiGPIOFactory()
+        self._factory = PiGPIOFactory(host=self._host)
         make_servo = partial(
             AngularServo,
             min_angle=0,
@@ -109,8 +116,9 @@ class ServoController:
         )
         return {name: make_servo(pin) for name, pin in self.config["servos"].items()}
 
+
 config = load_config()
 controller = ServoController(config)
-for i in ascii_uppercase:
-    controller.act(i)
-    sleep(1)
+# for i in ascii_uppercase:
+#     controller.act(i)
+#     sleep(1)
