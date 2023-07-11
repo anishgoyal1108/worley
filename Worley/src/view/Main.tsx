@@ -69,10 +69,12 @@ export function Main() {
     const [pc, dc] = start(settings);
     setPC(pc);
     setDC(dc);
+
     dc.onopen = () => {
       setConnectionStatus('connected');
     };
     dc.onmessage = (e) => {
+      console.log('Data channel message:', e.data);
       setMessage(e.data);
     };
     dc.onerror = (e) => {

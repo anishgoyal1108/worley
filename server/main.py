@@ -1,7 +1,7 @@
 import asyncio
 import socket
 import uuid
-from logging import DEBUG, basicConfig, getLogger
+from logging import getLogger
 import numpy as np
 
 from aiohttp import web
@@ -11,6 +11,7 @@ from models import load_speech_to_text
 from rtc import VADTrack
 from rich import print
 from rich.logging import RichHandler
+from collections import deque
 
 app = web.Application()
 router = web.RouteTableDef()
@@ -22,7 +23,7 @@ def setup_logger(logger, quiet=False):
     if quiet:
         logger.setLevel("WARNING")
     else:
-        logger.setLevel("INFO")
+        logger.setLevel("DEBUG")
         logger.handlers.clear()
         logger.addHandler(RichHandler())
 
@@ -33,6 +34,17 @@ setup_logger(getLogger("aioice"), quiet=True)
 
 pcs = set()  # NOTE: Maintain reference to peer connections to avoid garbage collection
 speech_to_text = load_speech_to_text()
+
+
+class Ref:
+    def __init__(self, value):
+        self.value = value
+
+    def set(self, value):
+        self.value = value
+
+    def get(self):
+        return self.value
 
 
 @router.get("/ping")
@@ -54,17 +66,37 @@ async def offer(request):
     def info(msg, *args):
         log.info(pc_id + " " + msg, *args)
 
+    def debug(msg, *args):
+        log.debug(pc_id + " " + msg, *args)
+
     info("Created for %s", request.remote)
 
-    channel = pc.createDataChannel("speech_recognition")
+    sr_dc = Ref(None)
+    queue = deque()
+
+    def send_text(text: str):
+        debug(f"Sending text: {text}")
+        if sr_dc.get() is not None:
+            sr_dc.get().send(text)
+            while len(queue):
+                text = queue.popleft()
+                sr_dc.send(text)
+        else:
+            debug(f"Queueing text: {text}")
+            queue.append(text)
+
     vad_track: VADTrack | None = None
     vad_task: asyncio.Task | None = None
 
     @pc.on("datachannel")
-    def on_datachannel(channel):
-        @channel.on("message")
+    def on_datachannel(c):
+        debug("Data channel created by remote party")
+        if c.label == "speech_recognition":
+            sr_dc.set(c)
+
+        @c.on("message")
         def on_message(message):
-            info("Data channel message received: %s", message)
+            debug("Data channel message received: %s", message)
 
     @pc.on("connectionstatechange")
     async def on_connectionstatechange():
@@ -82,9 +114,9 @@ async def offer(request):
             info("Adding VADTrack")
 
             def vad_callback(audio: np.ndarray):
-                log.info("VAD triggered")
-                text = speech_to_text(audio)
-                channel.send(text["text"])
+                log.debug(f"Received audio: {audio.shape}")
+                result = speech_to_text(audio)
+                send_text(result["text"])
 
             vad_track = VADTrack(
                 relay.subscribe(track),

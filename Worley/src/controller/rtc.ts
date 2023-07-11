@@ -69,7 +69,7 @@ export function start(
   var parameters = { ordered: true };
 
   const dc = pc.createDataChannel(
-    'text',
+    'speech_recognition',
     parameters,
   ) as unknown as RTCDataChannel;
 

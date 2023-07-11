@@ -25,11 +25,11 @@ class VADTrack:
     def __init__(
         self,
         track,
-        buffer_size=65536,
-        detection_window: int = 64,
-        overlap: int = 32,
-        min_speech_windows: int = 5,
-        confidence_threshold: float = 0.5,
+        buffer_size=4096,
+        detection_window: int = 16,
+        overlap: int = 8,
+        min_speech_windows: int = 4,
+        confidence_threshold: float = 0.45,
         speech_callback: Callable[[np.ndarray], None] | None = None,
     ):
         super().__init__()
