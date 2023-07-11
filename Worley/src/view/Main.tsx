@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import { Appbar, IconButton, Surface, useTheme } from 'react-native-paper';
-import {
-  RTCPeerConnection,
-  RTCSessionDescription,
-  mediaDevices,
-} from 'react-native-webrtc';
+import { RTCPeerConnection, mediaDevices } from 'react-native-webrtc';
 import tw from 'twrnc';
 
-import { post_json, post_offer } from '@controller';
+import { post_offer } from '@controller';
 import { MaterialIcons } from '@expo/vector-icons';
 import { SettingsType, useServerStatus, useSettings } from '@model';
 
@@ -62,19 +58,10 @@ function negotiate(
     .then(function () {
       var offer = pc.localDescription!!;
 
-      return fetch(`http://${server}/offer`, {
-        body: JSON.stringify({
-          sdp: offer.sdp,
-          type: offer.type,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
+      return post_offer(server, {
+        sdp: offer.sdp,
+        type: offer.type!!,
       });
-    })
-    .then(function (response) {
-      return response.json();
     })
     .then(function (answer) {
       return pc.setRemoteDescription(answer);
