@@ -171,4 +171,4 @@ controller = ServoController(config)
 # for i in ascii_uppercase:
 #     controller.act(i)
 #     sleep(1)
-# controller.act("MIN")
+controller.act("MIN")

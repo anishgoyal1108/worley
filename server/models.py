@@ -5,10 +5,14 @@ import torch
 import whisper
 
 
-def load_speech_to_text(model_size: str = "tiny"):
+def load_speech_to_text(model_size: str = "base"):
     info("Loading whisper...")
     model = whisper.load_model(model_size)
-    model = model.to("cuda" if torch.cuda.is_available() else "cpu")
+    if torch.cuda.is_available():
+        model = model.to("cuda")
+        info("Using GPU.")
+    else:
+        info("Using CPU.")
     info("Whisper loaded.")
 
     def transcribe(audio: np.ndarray):

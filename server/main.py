@@ -113,7 +113,7 @@ async def offer(request):
         if track.kind == "audio":
             info("Adding VADTrack")
 
-            def vad_callback(audio: np.ndarray):
+            async def vad_callback(audio: np.ndarray):
                 log.debug(f"Received audio: {audio.shape}")
                 result = speech_to_text(audio)
                 send_text(result["text"])

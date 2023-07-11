@@ -1,5 +1,5 @@
 import asyncio
-from collections.abc import Callable
+from collections.abc import Callable, Coroutine
 from logging import getLogger
 from pathlib import Path
 
@@ -30,7 +30,8 @@ class VADTrack:
         overlap: int = 8,
         min_speech_windows: int = 4,
         confidence_threshold: float = 0.45,
-        speech_callback: Callable[[np.ndarray], None] | None = None,
+        speech_callback: Callable[[np.ndarray], Coroutine[None, None, None]]
+        | None = None,
     ):
         super().__init__()
         self.track = track
@@ -55,6 +56,7 @@ class VADTrack:
 
         self.running = False
         self.task: asyncio.Task | None = None
+        self.callback_tasks: list[asyncio.Task] = []
 
     def start(self):
         self.running = True
@@ -101,7 +103,11 @@ class VADTrack:
             return
 
         if len(self.buffer) > self.buffer_size:
+            # TODO: Ring buffer
             self.buffer.pop(0)
+            self.confidence_pointer -= 1
+            self.speech_pointer -= 1
+
         if len(self.buffer) - self.confidence_pointer >= self.detection_window:
             start = self.confidence_pointer
             end = self.confidence_pointer + self.detection_window
@@ -117,11 +123,17 @@ class VADTrack:
                 if self.speech_window > self.min_speech_windows:
                     if self.speech_callback is not None:
                         log.debug(f"Speech detected: [{self.speech_pointer, start})")
-                        self.speech_callback(
-                            self.__prepare_audio(
-                                self.speech_pointer,
-                                start,
+                        task = asyncio.ensure_future(
+                            self.speech_callback(
+                                self.__prepare_audio(
+                                    self.speech_pointer,
+                                    start,
+                                )
                             )
                         )
+                        task.add_done_callback(
+                            lambda _: self.callback_tasks.remove(task)
+                        )
+                        self.callback_tasks.append(task)
                 self.speech_window = 0
                 self.speech_pointer = self.confidence_pointer
