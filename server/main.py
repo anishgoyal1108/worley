@@ -80,12 +80,16 @@ async def offer(request):
             info("Adding VADTrack")
 
             def vad_callback(audio: np.ndarray):
+                log.info("VAD triggered")
                 text = speech_to_text(audio)
                 print(text)
                 channel.send(text["text"])
 
             # TODO: find a less hacky way to subscribe to the audio stream
-            vad_track = VADTrack(relay.subscribe(track), speech_callback=vad_callback)
+            vad_track = VADTrack(
+                relay.subscribe(track),
+                speech_callback=vad_callback,
+            )
             pc.addTrack(vad_track)
 
         @track.on("ended")

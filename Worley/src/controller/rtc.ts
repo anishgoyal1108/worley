@@ -74,11 +74,11 @@ export function start(
   ) as unknown as RTCDataChannel;
 
   dc.onopen = function () {
-    console.log('Data channel is open and ready to be used.');
+    console.debug('Data channel is open and ready to be used.');
   };
 
   dc.onmessage = function (evt) {
-    console.log('Received message: ' + evt.data);
+    console.debug('Received message: ' + evt.data);
   };
 
   var constraints = {

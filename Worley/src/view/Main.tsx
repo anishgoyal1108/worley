@@ -61,11 +61,15 @@ export function Main() {
     theme = useTheme();
   const [pc, setPC] = useState<RTCPeerConnection | null>(null);
   const [dc, setDC] = useState<RTCDataChannel | null>(null);
+  const [message, setMessage] = useState('');
 
   const startRecording = () => {
     const [pc, dc] = start(settings);
     setPC(pc);
     setDC(dc);
+    dc.onmessage = (e) => {
+      setMessage(e.data);
+    };
     setIsRecording(true);
   };
 
@@ -76,17 +80,24 @@ export function Main() {
 
   const recordingScreen = () => (
     <View style={tw`flex-1 justify-center items-center`}>
-      <IconButton
-        icon={isRecording ? 'stop' : 'microphone'}
-        size={64}
-        onPress={() => {
-          if (isRecording) stopRecording();
-          else startRecording();
-        }}
-        mode="contained-tonal"
-        animated={true}
-        style={tw`w-28 h-28 rounded-full`}
-      />
+      <View style={tw`flex flex-col gap-2`}>
+        <IconButton
+          icon={isRecording ? 'stop' : 'microphone'}
+          size={64}
+          onPress={() => {
+            if (isRecording) stopRecording();
+            else startRecording();
+          }}
+          mode="contained-tonal"
+          animated={true}
+          style={tw`w-28 h-28 rounded-full`}
+        />
+        {isRecording && message && (
+          <Text variant="labelLarge" style={tw`text-center`}>
+            {message}
+          </Text>
+        )}
+      </View>
     </View>
   );
 
