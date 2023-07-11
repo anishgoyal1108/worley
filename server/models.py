@@ -1,11 +1,8 @@
 from logging import info
-from pathlib import Path
-from tempfile import TemporaryDirectory
 
 import numpy as np
 import torch
 import whisper
-import ffmpeg
 
 
 def load_speech_to_text(model_size: str = "tiny"):
