@@ -15,7 +15,6 @@ from rich.logging import RichHandler
 app = web.Application()
 router = web.RouteTableDef()
 
-basicConfig(level=DEBUG)
 log = getLogger(__name__)
 
 
@@ -58,6 +57,8 @@ async def offer(request):
     info("Created for %s", request.remote)
 
     channel = pc.createDataChannel("speech_recognition")
+    vad_track: VADTrack | None = None
+    vad_task: asyncio.Task | None = None
 
     @pc.on("datachannel")
     def on_datachannel(channel):
@@ -74,6 +75,7 @@ async def offer(request):
 
     @pc.on("track")
     def on_track(track):
+        nonlocal vad_task, vad_track
         info("Track %s received", track.kind)
 
         if track.kind == "audio":
@@ -82,20 +84,19 @@ async def offer(request):
             def vad_callback(audio: np.ndarray):
                 log.info("VAD triggered")
                 text = speech_to_text(audio)
-                print(text)
                 channel.send(text["text"])
 
-            # TODO: find a less hacky way to subscribe to the audio stream
             vad_track = VADTrack(
                 relay.subscribe(track),
                 speech_callback=vad_callback,
             )
-            pc.addTrack(vad_track)
+            vad_track.start()
 
         @track.on("ended")
         async def on_ended():
             info("Track %s ended", track.kind)
             track.stop()
+            vad_track.stop()
 
     # handle offer
     await pc.setRemoteDescription(offer)

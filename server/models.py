@@ -19,11 +19,7 @@ def load_speech_to_text(model_size: str = "tiny"):
 
 def load_vad():
     info("Loading Sliero...")
-    model, utils = torch.hub.load(
-        repo_or_dir="snakers4/silero-vad",
-        model="silero_vad",
-        force_reload=True,
-    )
+    model, utils = torch.hub.load(repo_or_dir="snakers4/silero-vad", model="silero_vad")
     (get_speech_ts, *_) = utils
     info("Sliero loaded.")
 

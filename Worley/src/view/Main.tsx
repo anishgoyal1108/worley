@@ -39,7 +39,7 @@ function StatusBox({
   return (
     <View
       key={label}
-      style={tw`flex-1 flex-row gap-2 justify-center items-center`}
+      style={tw`flex flex-row gap-2 justify-center items-center`}
     >
       <Text variant="labelLarge">{label}</Text>
       {
@@ -62,13 +62,25 @@ export function Main() {
   const [pc, setPC] = useState<RTCPeerConnection | null>(null);
   const [dc, setDC] = useState<RTCDataChannel | null>(null);
   const [message, setMessage] = useState('');
+  const [connectionStatus, setConnectionStatus] =
+    useState<StatusBoxType>('connecting');
 
   const startRecording = () => {
     const [pc, dc] = start(settings);
     setPC(pc);
     setDC(dc);
+    dc.onopen = () => {
+      setConnectionStatus('connected');
+    };
     dc.onmessage = (e) => {
       setMessage(e.data);
+    };
+    dc.onerror = (e) => {
+      console.error('Data channel error:', e);
+      setConnectionStatus('failed');
+    };
+    dc.onclose = () => {
+      setConnectionStatus('failed');
     };
     setIsRecording(true);
   };
@@ -79,25 +91,23 @@ export function Main() {
   };
 
   const recordingScreen = () => (
-    <View style={tw`flex-1 justify-center items-center`}>
-      <View style={tw`flex flex-col gap-2`}>
-        <IconButton
-          icon={isRecording ? 'stop' : 'microphone'}
-          size={64}
-          onPress={() => {
-            if (isRecording) stopRecording();
-            else startRecording();
-          }}
-          mode="contained-tonal"
-          animated={true}
-          style={tw`w-28 h-28 rounded-full`}
-        />
-        {isRecording && message && (
-          <Text variant="labelLarge" style={tw`text-center`}>
-            {message}
-          </Text>
-        )}
-      </View>
+    <View style={tw`flex h-full justify-center items-center`}>
+      <IconButton
+        icon={isRecording ? 'stop' : 'microphone'}
+        size={64}
+        onPress={() => {
+          if (isRecording) stopRecording();
+          else startRecording();
+        }}
+        mode="contained-tonal"
+        animated={true}
+        style={tw`w-28 h-28 rounded-full`}
+      />
+      {isRecording && message && (
+        <Text variant="labelLarge" style={tw`text-center`}>
+          {message}
+        </Text>
+      )}
     </View>
   );
 
