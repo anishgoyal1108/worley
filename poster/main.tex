@@ -12,13 +12,20 @@
 \usepackage{array}
 \usepackage{xparse}
 \usepackage{wrapfig}
+\usepackage{xspace}
+% necessary acronyms
+\def\ie{\textit{i.e.}\xspace}
+\def\eg{\textit{e.g.}\xspace}
+\def\etc{\textit{etc.}\xspace}
+\def\etal{\textit{et al.}\xspace}
+\def\cf{\textit{cf.}\xspace}
 % font
 \usefonttheme{serif}
 \setbeamerfont{block title}{size=\Large, series=\bfseries}
 \setbeamerfont{headline title}{size=\fontsize{96}{0pt}\selectfont, series=\bfseries}
 \setbeamerfont{headline author}{size=\large, series=\bfseries}
 % main color
-\definecolor{theme-1}{HTML}{2155CD} % #2155CD
+\definecolor{theme-1}{HTML}{3b82f6} % #3b82f6
 \definecolor{theme-2}{HTML}{0AA1DD} % #0AA1DD
 \definecolor{theme-3}{HTML}{79DAE8} % #79DAE8
 \definecolor{theme-4}{HTML}{E8F9FD} % #E8F9FD
@@ -117,13 +124,12 @@
     \margincolumn
 
     \begin{column}{\colwidth}
-      \begin{block}{Cord Actuation}
+      \begin{block}{Mechanical Design}
+        \header{Cord Actuation}[0pt]
 
         The fingers are curled by servo-driven pull cords. By reducing the available length of the cord, the surfaces of the finger segments are pulled closer to one another. The surfaces are angled 90 degrees; so the finger rotates around the back (where there is no gap) to curl. We utilized ripoff SG90 servos for this task, as they're cost-effective, space-efficient, and have the minimum sufficient torque required to actuate the fingers.
 
-      \end{block}
-
-      \begin{block}{Compliant Hinges}
+        \header{Compliant Hinges}{2cm}
         \begin{wrapfigure}{r}{0.5\linewidth}
           \centering
           \includegraphics[width=0.75\linewidth]{images/compliant-hinge.png}
@@ -133,7 +139,6 @@
 
         Compliant hinges connect the finger segments, allowing the finger to curl as a single part. This is accomplished by 3D printing the fingers in polypropylene (PP); a polymer ideally suited for compliant hinges due to its fatigue-resistant and semi-rigid properties. The hinges are designed using splines constrained by their connection points and length, such that when the segment is rotated 90 degrees it has the proper length to temporarily deform into a circle. The energy stored in this deformation allows the fingers to passively return to their original position when the cord tension is released.
       \end{block}
-
     \end{column}
 
     \separatorcolumn
@@ -196,7 +201,22 @@
     \separatorcolumn
 
     \begin{column}{\colwidth}
+      \begin{block}{System Architeture}
+        \begin{figure}[ht]
+          \centering
+          \includegraphics[width=0.8\linewidth]{images/flowchart.png}
+          \caption{Flowchart of the system architecture}
+          \label{fig:flowchart}
+        \end{figure}
 
+        \begin{itemize}
+          \item The user speaks into the Worley application on their phone.
+          \item The application establishes a Web real-time communication (WebRTC) connection with the server and streams the audio.
+          \item The server runs a lightweight voice activation detection (VAD) model \texttt{sliero} detects speech. Such results are buffered into a queue along with the timestamps, and a 2-pointer technique is used to extract the longest continuous subsequence, \ie, the speech. Such segments are sent to \texttt{whisper} for speech recognition.
+          \item The text is translated to ASL language using a custom-built transformer model trained on the \texttt{ASLG-PC12} dataset.
+          \item The ASL translation is sent to the Raspberry Pi, which controls the robotic hand, and the mobile application.
+        \end{itemize}
+      \end{block}
     \end{column}
 
     \margincolumn
