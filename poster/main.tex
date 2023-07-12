@@ -237,6 +237,20 @@
           \item The ASL translation is sent to the Raspberry Pi, which controls the robotic hand, and the mobile application.
         \end{itemize}
       \end{block}
+
+      \begin{block}{Challenges}
+        \begin{itemize}
+          \item More tolerance would be needed for the servo motors to control the index finger to move behind the palm.
+          \item Whisper model, even the CTranslate2 version, would require $1735\,\text{ms}\pm 139\,\text{ms}$ to translate a 3-second speech, which is not real-time. Deployment of the servo independently from the HTTP server on KServe would be needed to ensure performance and scalability.
+          \item Polypropylene failed to print successfully on the 3D printer; further, the printed version has structural defects \& fatigue issues, rendering the hand to be less realistic.
+        \end{itemize}
+      \end{block}
+
+      \begin{block}{Conclusions}
+        In this project, we successfully developed a robotic hand that can act out ASL and be controlled using a mobile application and voice commands.
+
+        Despite defects in the final product, along with many challenges that we faced on the road, we believe that this project has the potential to be further developed and improved. Future work could focus on improving the performance and scalability of the speech recognition system, as well as enhancing the realism of the hand. Overall, this project demonstrates the potential of combining robotics, mobile applications, and speech recognition to create innovative and interactive systems.
+      \end{block}
     \end{column}
 
     \margincolumn
