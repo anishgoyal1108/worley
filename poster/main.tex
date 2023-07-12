@@ -25,13 +25,13 @@
 \setbeamerfont{headline title}{size=\fontsize{96}{0pt}\selectfont, series=\bfseries}
 \setbeamerfont{headline author}{size=\large, series=\bfseries}
 % main color
-\definecolor{theme-1}{HTML}{3b82f6} % #3b82f6
-\definecolor{theme-2}{HTML}{0AA1DD} % #0AA1DD
-\definecolor{theme-3}{HTML}{79DAE8} % #79DAE8
-\definecolor{theme-4}{HTML}{E8F9FD} % #E8F9FD
+\definecolor{theme-1}{HTML}{ef4444} % #ef4444
+\definecolor{theme-2}{HTML}{f97316} % #f97316
+\definecolor{theme-3}{HTML}{f5f5f4} % #f5f5f4
+\definecolor{theme-4}{HTML}{fafaf9} % #fafaf9
 % set color
-\setbeamercolor{block title}{fg=white, bg=theme-2}
-\setbeamercolor{headline title}{fg=white, fg=theme-2}
+\setbeamercolor{block title}{fg=theme-3, bg=theme-1}
+\setbeamercolor{headline title}{fg=theme-4, fg=theme-1}
 % linespace
 \usepackage{setspace}
 \setstretch{1.5}
@@ -88,8 +88,6 @@
 \usepackage{multicol}
 % hanging indent
 \usepackage{hanging}
-% color
-\setbeamercolor{block title}{fg=white, bg=theme-2}
 % numbered figure and table
 \setbeamertemplate{caption}[numbered]
 % metadata
@@ -101,7 +99,7 @@
 \let\block=\undefined
 \let\endblock=\undefined
 \usepackage[most]{tcolorbox}
-\newtcolorbox{block}[1]{enhanced, colback=white, colframe=theme-2!50, colbacktitle=theme-2, coltitle=white, fonttitle=\bfseries, title=\Large#1, boxrule=1pt, boxsep=1.5em, breakable, sharpish corners, bottomrule=0.5em, toptitle=-0.75em, bottomtitle=-0.75em}
+\newtcolorbox{block}[1]{enhanced, colback=white, colframe=theme-1!50, colbacktitle=theme-1, coltitle=white, fonttitle=\bfseries, title=\Large#1, boxrule=1pt, boxsep=1.5em, breakable, sharpish corners, bottomrule=0.5em, toptitle=-0.75em, bottomtitle=-0.75em}
 % microtype
 \usepackage[activate={true,nocompatibility},final]{microtype}
 
@@ -136,7 +134,7 @@
 
         The fingers are curled by servo-driven pull cords. By reducing the available length of the cord, the surfaces of the finger segments are pulled closer to one another. The surfaces are angled 90 degrees; so the finger rotates around the back (where there is no gap) to curl. We utilized ripoff SG90 servos for this task, as they're cost-effective, space-efficient, and have the minimum sufficient torque required to actuate the fingers.
 
-        \header{Compliant Hinges}[2cm]
+        \header{Compliant Hinges}[3cm]
 
         \begin{wrapfigure}{r}{0.35\linewidth}
           \centering
@@ -148,13 +146,20 @@
         Compliant hinges connect the finger segments, allowing the finger to curl as a single part. This is accomplished by 3D printing the fingers in polypropylene (PP); a polymer ideally suited for compliant hinges due to its fatigue-resistant and semi-rigid properties. The hinges are designed using splines constrained by their connection points and length, such that when the segment is rotated 90 degrees it has the proper length to temporarily deform into a circle. The energy stored in this deformation allows the fingers to passively return to their original position when the cord tension is released.
       \end{block}
 
-      \begin{block}{Material}
+      \begin{block}{System Architeture}
+        \begin{figure}[ht]
+          \centering
+          \includegraphics[width=0.55\linewidth]{images/flowchart.png}
+          \caption{Flowchart of the system architecture}
+          \label{fig:flowchart}
+        \end{figure}
+
         \begin{itemize}
-          \item 5 SG90 servo, servo horns, and screws
-          \item 4 3D printed fingers + 1 3D printed palm
-          \item Polypropylene filament \& Polylactic acid filament
-          \item 1 Raspberry PI 4B
-          \item \texttt{faster\_whisper}, \texttt{pytorch}, \texttt{asyncio}, \texttt{pyav}, \texttt{aiohttp}, \texttt{aiortc}, Expo Framework.
+          \item The user speaks into the Worley application on their phone.
+          \item The application establishes a Web real-time communication (WebRTC) connection with the server and streams the audio.
+          \item The server runs a lightweight voice activation detection (VAD) model \texttt{sliero} detects speech. Such results are buffered into a queue along with the timestamps, and a 2-pointer technique is used to extract the longest continuous subsequence, \ie, the speech. Such segments are sent to \texttt{whisper} for speech recognition.
+          \item The text is translated to ASL language using a custom-built transformer model trained on the \texttt{ASLG-PC12} dataset.
+          \item The ASL translation is sent to the Raspberry Pi, which controls the robotic hand, and the mobile application.
         \end{itemize}
       \end{block}
 
@@ -164,7 +169,26 @@
     \separatorcolumn
 
     \begin{column}{\colwidth}
+      \begin{block}{Introduction}
+        The Final Engineering Project for the 60th Georgia Governor's Honor Program was an ambitious endeavor that spanned over 9 days, with a modest budget of \$150.
+
+        % The goal of the project was to design a groundbreaking system capable of converting voice input into American Sign Language (ASL) output in real-time. The primary purpose of this system was to serve as a presentation aide and an educational tool for teaching sign language.
+
+        One of the key distinguishing features of this project was its real-time interpretation capability. Unlike existing systems that often require a delay between input and output, our team aimed to develop a solution that could instantaneously translate spoken words into sign language. This real-time aspect was crucial to ensure smooth and efficient communication between hearing and deaf individuals.
+
+        Moreover, the project aimed to tackle the unique sentence structure employed in ASL. ASL differs significantly from spoken languages in terms of grammar and syntax. Therefore, the system had to be designed to understand and interpret the grammatical rules of ASL accurately. This aspect presented a significant challenge for our team, as it required deep understanding and analysis of ASL linguistics.
+
+        The other significant aspect of our project was the design of the robotic hand used for signing. We recognized the importance of creating a hand that was specifically optimized for signing, taking into account the intricate movements and gestures required for accurate ASL communication. The hand design needed to be both precise and dexterous, capable of reproducing the subtle nuances and expressiveness of human signing.
+
+        Throughout the project, the team faced numerous technical and logistical challenges. Designing and building a functional system within a limited budget and timeframe required careful planning, resourcefulness, and efficient use of available materials and technologies.
+
+        % To accomplish the project goals, the team employed a multidisciplinary approach, combining knowledge and skills from various engineering fields such as robotics, signal processing, and machine learning. The team members worked collaboratively, leveraging their diverse expertise to tackle different aspects of the project.
+
+        % In conclusion, the Final Engineering Project for the 60th Georgia Governor's Honor Program aimed to develop a unique system that could convert voice input into ASL output in real-time. By focusing on real-time interpretation, ASL grammar, and a signing-optimized hand design, the project sought to overcome existing limitations in the field. The endeavor required innovation, technical expertise, and collaboration, ultimately aiming to provide a valuable tool for both presentations and the teaching of sign language.
+      \end{block}
+
       \begin{block}{Goal}
+        \header{Goal}[0pt]
 
         The goal of \textsc{Project Worley} is to create a wireless online real-time language expression yielder (WORLEY) that can be used to act out American Sign Language (ASL) in real-time. Specifically, WORLEY will be able to:
 
@@ -173,16 +197,30 @@
           \item Act out the translation on the robotic hand through remote general-purpose input/output (GPIO) control.
         \end{itemize}
 
-        \header{Motivation}[0pt]
+        \header{Motivation}[2cm]
 
         Our friend Cory suffered from hearing loss, making communication difficult. We aimed to develop a device to improve communication and quality of life for Cory and others in similar situations.
 
         This device can also be used for Pre-K and K-12 students.  While it may seem easy for parents to learn ASL and teach it to their kids, ASL is a complex language with its grammar, syntax, and nuances. \emph{WORLEY} give necessary language exposure \& support for the deaf children and their parents.
       \end{block}
 
+      \begin{block}{Material}
+        \begin{itemize}
+          \item 5 SG90 servo, servo horns, and screws
+          \item 4 3D printed fingers + 1 3D printed palm
+          \item Polypropylene filament \& Polylactic acid filament
+          \item 1 Raspberry PI 4B
+          \item \texttt{faster\_whisper}, \texttt{pytorch}, \texttt{asyncio}, \texttt{pyav}, \texttt{aiohttp}, \texttt{aiortc}, Expo Framework.
+        \end{itemize}
+      \end{block}
+    \end{column}
+
+    \separatorcolumn
+
+    \begin{column}{\colwidth}
       \begin{block}{Significance}
         \header{Existing Solution}[0pt]
-
+        \vspace{1cm}
         \begin{figure}[ht]
           \centering
           \begin{subfigure}[b]{0.45\linewidth}
@@ -214,27 +252,6 @@
           \item ASL is the third most used language in the United States \& the Americans with Disabilities Act (ADA) requires businesses to provide ASL interpreters.
           \item In the United States, 30 deaf children are born every day, and 90\% of their parents do not know ASL.
           \item \emph{WORLEY} will help to solve this problem by providing a low-cost, portable, and easy-to-use solution for ASL interpretation.
-        \end{itemize}
-      \end{block}
-    \end{column}
-
-    \separatorcolumn
-
-    \begin{column}{\colwidth}
-      \begin{block}{System Architeture}
-        \begin{figure}[ht]
-          \centering
-          \includegraphics[width=0.85\linewidth]{images/flowchart.png}
-          \caption{Flowchart of the system architecture}
-          \label{fig:flowchart}
-        \end{figure}
-
-        \begin{itemize}
-          \item The user speaks into the Worley application on their phone.
-          \item The application establishes a Web real-time communication (WebRTC) connection with the server and streams the audio.
-          \item The server runs a lightweight voice activation detection (VAD) model \texttt{sliero} detects speech. Such results are buffered into a queue along with the timestamps, and a 2-pointer technique is used to extract the longest continuous subsequence, \ie, the speech. Such segments are sent to \texttt{whisper} for speech recognition.
-          \item The text is translated to ASL language using a custom-built transformer model trained on the \texttt{ASLG-PC12} dataset.
-          \item The ASL translation is sent to the Raspberry Pi, which controls the robotic hand, and the mobile application.
         \end{itemize}
       \end{block}
 
