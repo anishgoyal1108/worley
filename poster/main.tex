@@ -122,8 +122,6 @@
     \margincolumn
 
     \begin{column}{\colwidth}
-
-
       \begin{block}{Goal}
         \header{Goal}[0pt]
 
@@ -141,13 +139,41 @@
         This device can also be used for Pre-K and K-12 students.  While it may seem easy for parents to learn ASL and teach it to their kids, ASL is a complex language with its grammar, syntax, and nuances. WORLEY provides the necessary language exposure \& support for hard-of-hearing children and their parents.
       \end{block}
 
-      \begin{block}{Material}
+      \begin{block}{Significance}
+        \header{Existing Solution}[0pt]
+        \vspace{1cm}
+        \begin{figure}[ht]
+          \centering
+          \begin{subfigure}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=\linewidth]{images/aslan.png}
+            \caption{Project ASLAN}
+            \label{fig:aslan}
+          \end{subfigure}
+          \begin{subfigure}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=0.425\linewidth]{images/instructable-hand.png}
+            \caption{Instructable Hand}
+            \label{fig:instructable-hand}
+          \end{subfigure}
+        \end{figure}
+
+        Existing solutions to act out ASL exists. However, they have several drawbacks:
+
         \begin{itemize}
-          \item 5 SG90 servo, servo horns, and screws
-          \item 4 3D printed fingers + 1 3D printed palm
-          \item Polypropylene filament \& Polylactic acid filament
-          \item 1 Raspberry PI 4B
-          \item \texttt{faster\_whisper}, \texttt{pytorch}, \texttt{asyncio}, \texttt{pyav}, \texttt{aiohttp}, \texttt{aiortc}, Expo Framework.
+          \item They merely perform manually-coded English (MCE), which is not the same as ASL and doesn't have the same grammar, syntax, and nuances.
+          \item They are incapable to act out ASL in real-time or require text input instead of speech input.
+        \end{itemize}
+
+        \header{Significance}[1cm]
+
+        \begin{itemize}
+          % \item 10,000 people in the United States are registered as ASL interpreters.
+          \item In comparison, 37.5 million people in the United States suffer from hearing problems.
+
+                % \item ASL is the third most used language in the United States \& the Americans with Disabilities Act (ADA) requires businesses to provide ASL interpreters.
+          \item In the United States, 30 deaf children are born every day, and 90\% of their parents do not know ASL.
+          \item \emph{WORLEY} will help to solve this problem by providing a low-cost, portable, and easy-to-use solution for ASL interpretation.
         \end{itemize}
       \end{block}
     \end{column}
@@ -157,7 +183,7 @@
     \begin{column}{\twocolwidth}
       \begin{block}{Introduction}
         \begin{multicols}{2}
-          % The Final Engineering Project for the 60th Georgia Governor's Honor Program was an ambitious endeavor that spanned over 9 days, with a modest budget of \$150.
+          % The Final Engineering Project for the 60th Georgia Governor's Honor Program is a 9-day adventure in which a team of 3 students worked together to design and build a unique system.
 
           % The goal of the project was to design a groundbreaking system capable of converting voice input into American Sign Language (ASL) output in real-time. The primary purpose of this system was to serve as a presentation aide and an educational tool for teaching sign language.
 
@@ -226,48 +252,21 @@
     \separatorcolumn
 
     \begin{column}{\colwidth}
-      \begin{block}{Significance}
-        \header{Existing Solution}[0pt]
-        \vspace{1cm}
-        \begin{figure}[ht]
-          \centering
-          \begin{subfigure}[b]{0.45\linewidth}
-            \centering
-            \includegraphics[width=\linewidth]{images/aslan.png}
-            \caption{Project ASLAN}
-            \label{fig:aslan}
-          \end{subfigure}
-          \begin{subfigure}[b]{0.45\linewidth}
-            \centering
-            \includegraphics[width=0.425\linewidth]{images/instructable-hand.png}
-            \caption{Instructable Hand}
-            \label{fig:instructable-hand}
-          \end{subfigure}
-        \end{figure}
-
-        Existing solutions to act out ASL exists. However, they have several drawbacks:
-
-        \begin{itemize}
-          \item They merely perform manually-coded English (MCE), which is not the same as ASL and doesn't have the same grammar, syntax, and nuances.
-          \item They are incapable to act out ASL in real-time or require text input instead of speech input.
-        \end{itemize}
-
-        \header{Significance}[2cm]
-
-        \begin{itemize}
-          \item 10,000 people in the United States are registered as ASL interpreters.
-          \item In comparison, 37.5 million people in the United States suffer from hearing problems.
-          \item ASL is the third most used language in the United States \& the Americans with Disabilities Act (ADA) requires businesses to provide ASL interpreters.
-          \item In the United States, 30 deaf children are born every day, and 90\% of their parents do not know ASL.
-          \item \emph{WORLEY} will help to solve this problem by providing a low-cost, portable, and easy-to-use solution for ASL interpretation.
-        \end{itemize}
-      \end{block}
-
       \begin{block}{Challenges}
         \begin{itemize}
           \item More tolerance would be needed for the servo motors to control the index finger to move behind the palm.
           \item Whisper model, even the CTranslate2 version, would require $1735\,\text{ms}\pm 139\,\text{ms}$ to translate a 3-second speech, which is not real-time. Deployment of the servo independently from the HTTP server on KServe would be needed to ensure performance and scalability.
           \item Polypropylene failed to print successfully on the 3D printer; further, the printed version has structural defects \& fatigue issues, rendering the hand to be less realistic.
+        \end{itemize}
+      \end{block}
+
+      \begin{block}{Material}
+        \begin{itemize}
+          \item 5 SG90 servo, servo horns, and screws
+          \item 4 3D printed fingers + 1 3D printed palm
+          \item Polypropylene filament \& Polylactic acid filament
+          \item 1 Raspberry PI 4B
+          \item \texttt{faster\_whisper}, \texttt{pytorch}, \texttt{asyncio}, \texttt{pyav}, \texttt{aiohttp}, \texttt{aiortc}, Expo Framework.
         \end{itemize}
       \end{block}
 
