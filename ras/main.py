@@ -3,10 +3,13 @@ import logging
 import re
 from pathlib import Path
 from time import sleep
+from typing import Literal
+from string import ascii_uppercase
+from tqdm import tqdm
 
 import yaml
 from jsonschema import validate
-from typing import Literal
+from rich import print
 from rich.logging import RichHandler
 
 log = logging.getLogger()
@@ -64,7 +67,7 @@ class Servo:
             value = self.max - value + self.min
         if self.backend == "gpiozero":
             log.debug(f"Setting {self.pin} to {value}")
-            self._servo.angle = value
+            self._servo.angle = int(value)
         else:
             angle = (value - self.min) / (self.max - self.min) * 180
             angle = self.max - angle
@@ -122,6 +125,9 @@ class ServoController:
         }
         self._words = self.config["words"]
 
+    def reload(self, config):
+        self._words = config["words"]
+
     def __getattr__(self, name):
         if name in self._servos:
             return self._servos[name]
@@ -168,7 +174,38 @@ class ServoController:
 
 config = load_config()
 controller = ServoController(config)
-# for i in ascii_uppercase:
-#     controller.act(i)
-#     sleep(1)
 controller.act("MIN")
+
+
+def repl():
+    global controller, config
+    while True:
+        try:
+            print("Enter word: ")
+            word = input()
+            if word == "re":
+                config = load_config()
+                controller.reload(config)
+                continue
+            controller.act(word)
+            print("Press enter to continue...")
+            reload = input()
+            if reload == "re":
+                config = load_config()
+                controller.reload(config)
+            controller.act("MIN")
+        except KeyboardInterrupt:
+            break
+
+
+def alphabet_dance():
+    global controller
+    for word in tqdm(ascii_uppercase):
+        controller.act(word)
+        sleep(2)
+    controller.act("MIN")
+
+
+if __name__ == "__main__":
+    # alphabet_dance()
+    repl()

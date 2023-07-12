@@ -1,7 +1,7 @@
 version: v0.1.0
 config:
   servos:
-    thumb: 4
+    thumb: { pin: 10 }
     index: 22
     index_shift: 2
     middle: 27
@@ -26,7 +26,7 @@ config:
       small: 0
       palm: 0
     A:
-      thumb: 180
+      thumb: 90
       index: 180
       index_shift: 90
       middle: 180
@@ -34,7 +34,7 @@ config:
       small: 180
       palm: 0
     B:
-      thumb: 135
+      thumb: 180
       index: 0
       index_shift: 90
       middle: 0
@@ -43,11 +43,11 @@ config:
       palm: 0
     C:
       thumb: 45
-      index: 90
-      index_shift: 90
-      middle: 90
-      ring: 90
-      small: 90
+      index: 135
+      index_shift: 135
+      middle: 135
+      ring: 135
+      small: 135
       palm: 0
     D:
       thumb: 135
@@ -66,7 +66,7 @@ config:
       small: 135
       palm: 0
     F:
-      thumb: 45
+      thumb: 1
       index: 135
       index_shift: 90
       middle: 0
@@ -74,7 +74,7 @@ config:
       small: 0
       palm: 45
     G:
-      thumb: 30
+      thumb: 90
       index: 0
       index_shift: 90
       middle: 180
@@ -86,11 +86,11 @@ config:
       palm: 180
       index: 0
       index_shift: 20
-      middle: 180
+      middle: 0
       ring: 180
       small: 180
     I:
-      thumb: 90
+      thumb: 180
       index: 180
       index_shift: 0
       middle: 180
@@ -106,7 +106,7 @@ config:
       small: 0
       palm: 0
     K:
-      thumb: 90
+      thumb: 115
       palm: 180
       index: 0
       # TODO: can we get more realistic index_shift?
@@ -131,7 +131,7 @@ config:
       small: 180
       palm: 10
     N:
-      thumb: 180
+      thumb: 135
       index: 145
       index_shift: 0
       middle: 145
@@ -139,7 +139,7 @@ config:
       small: 180
       palm: 10
     Z:
-      thumb: 135
+      thumb: 180
       index: 0
       index_shift: 90
       middle: 180
@@ -152,11 +152,11 @@ config:
       index_shift: 0
       middle: 180
       ring: 180
-      small: 100
+      small: 0
       palm: 0
     X:
       thumb: 130
-      index: 90
+      index: 0
       index_shift: 0
       middle: 180
       ring: 180
@@ -195,7 +195,7 @@ config:
       small: 180
       palm: 5
     S:
-      thumb: 120
+      thumb: 180
       index: 180
       index_shift: 0
       middle: 180
@@ -211,7 +211,7 @@ config:
       small: 180
       palm: 15
     Q:
-      thumb: 0
+      thumb: 100
       index: 0
       index_shift: 0
       middle: 180
@@ -219,18 +219,18 @@ config:
       small: 180
       palm: 0
     P:
-      thumb: 10
+      thumb: 100
       index: 0
       index_shift: 0
-      middle: 0
+      middle: 90
       ring: 180
       small: 180
       palm: 5
     O:
-      thumb: 90
+      thumb: 120
       index: 90
       index_shift: 0
-      middle: 90
-      ring: 90
-      small: 90
+      middle: 120
+      ring: 150
+      small: 180
       palm: 180
