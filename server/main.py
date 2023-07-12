@@ -135,13 +135,14 @@ async def offer(request):
                 text = speech_to_text(audio)
                 log.debug(f"Transcribed in {time.time() - start}s: {text}")
                 send_text(text)
+                text = text.upper()
                 for c in text:
+                    send_text("acting " + c)
                     if not c in config['words']:
                         time.sleep(0.5)
                         servo_controller.act("MIN")
                         continue
                     servo_controller.act(c)
-                
 
             vad_track = VADTrack(
                 relay.subscribe(track),
