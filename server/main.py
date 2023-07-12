@@ -4,6 +4,7 @@ import time
 import uuid
 from collections import deque
 from logging import getLogger
+from ras import ServoController, load_config
 
 import numpy as np
 from aiohttp import web
@@ -35,6 +36,9 @@ setup_logger(getLogger("aiortc"), quiet=True)
 setup_logger(getLogger("aioice"), quiet=True)
 
 pcs = set()  # NOTE: Maintain reference to peer connections to avoid garbage collection
+
+config = load_config()
+servo_controller = ServoController(config)
 
 
 class Ref:
@@ -131,6 +135,13 @@ async def offer(request):
                 text = speech_to_text(audio)
                 log.debug(f"Transcribed in {time.time() - start}s: {text}")
                 send_text(text)
+                for c in text:
+                    if not c in config['words']:
+                        time.sleep(0.5)
+                        servo_controller.act("MIN")
+                        continue
+                    servo_controller.act(c)
+                
 
             vad_track = VADTrack(
                 relay.subscribe(track),

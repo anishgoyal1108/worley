@@ -76,7 +76,7 @@ class Servo:
             self._servo.angle = angle
 
     def __load_adafruit_servo(self):
-        from adafruit_servokit import ServoKit
+        from adafruit_servokit import ServoKit # type ignore
 
         kit = ServoKit(channels=16)
         return kit.servo[self.pin]
