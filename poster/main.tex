@@ -51,7 +51,7 @@
 \setlength{\contentheight}{\paperheight - 3in}
 \setlength{\sepwidth}{0.005\contentwidth}
 % 4 columns
-\setlength{\colwidth}{(\contentwidth - 2\sepwidth) / 3}
+\setlength{\colwidth}{(\contentwidth - 3\sepwidth) / 4}
 \setlength{\twocolwidth}{\colwidth + \sepwidth + \colwidth}
 % empty spacer column
 \NewDocumentCommand{\separatorcolumn}{}{\begin{column}{\sepwidth}\end{column}}
@@ -122,70 +122,7 @@
     \margincolumn
 
     \begin{column}{\colwidth}
-      \begin{block}{Mechanical Design}
-        \header{Cord Actuation}[0pt]
 
-        \begin{wrapfigure}{r}{0.35\linewidth}
-          \centering
-          \includegraphics[width=0.35\linewidth]{images/finger.png}
-          \caption{CAD of cord actuation design}
-          \label{fig:cord-actuation}
-        \end{wrapfigure}
-
-        The fingers are curled by servo-driven pull cords. By reducing the available length of the cord, the surfaces of the finger segments are pulled closer to one another. The surfaces are angled 90 degrees; so the finger rotates around the back (where there is no gap) to curl. We utilized ripoff SG90 servos for this task, as they're cost-effective, space-efficient, and have the minimum sufficient torque required to actuate the fingers.
-
-        \header{Compliant Hinges}[3cm]
-
-        \begin{wrapfigure}{r}{0.35\linewidth}
-          \centering
-          \includegraphics[width=0.75\linewidth]{images/compliant-hinge.png}
-          \caption{CAD of compliant hinge design}
-          \label{fig:compliant-hinge}
-        \end{wrapfigure}
-
-        Compliant hinges connect the finger segments, allowing the finger to curl as a single part. This is accomplished by 3D printing the fingers in polypropylene (PP); a polymer ideally suited for compliant hinges due to its fatigue-resistant and semi-rigid properties. The hinges are designed using splines constrained by their connection points and length, such that when the segment is rotated 90 degrees it has the proper length to temporarily deform into a circle. The energy stored in this deformation allows the fingers to passively return to their original position when the cord tension is released.
-      \end{block}
-
-      \begin{block}{System Architeture}
-        \begin{figure}[ht]
-          \centering
-          \includegraphics[width=0.55\linewidth]{images/flowchart.png}
-          \caption{Flowchart of the system architecture}
-          \label{fig:flowchart}
-        \end{figure}
-
-        \begin{itemize}
-          \item The user speaks into the Worley application on their phone.
-          \item The application establishes a Web real-time communication (WebRTC) connection with the server and streams the audio.
-          \item The server runs a lightweight voice activation detection (VAD) model \texttt{sliero} detects speech. Such results are buffered into a queue along with the timestamps, and a 2-pointer technique is used to extract the longest continuous subsequence, \ie, the speech. Such segments are sent to \texttt{whisper} for speech recognition.
-          \item The text is translated to ASL language using a custom-built transformer model trained on the \texttt{ASLG-PC12} dataset.
-          \item The ASL translation is sent to the Raspberry Pi, which controls the robotic hand, and the mobile application.
-        \end{itemize}
-      \end{block}
-
-
-    \end{column}
-
-    \separatorcolumn
-
-    \begin{column}{\colwidth}
-      \begin{block}{Introduction}
-        The Final Engineering Project for the 60th Georgia Governor's Honor Program was an ambitious endeavor that spanned over 9 days, with a modest budget of \$150.
-
-        % The goal of the project was to design a groundbreaking system capable of converting voice input into American Sign Language (ASL) output in real-time. The primary purpose of this system was to serve as a presentation aide and an educational tool for teaching sign language.
-
-        One of the key distinguishing features of this project was its real-time interpretation capability. Unlike existing systems that often require a delay between input and output, our team aimed to develop a solution that could instantaneously translate spoken words into sign language. This real-time aspect was crucial to ensure smooth and efficient communication between hearing and deaf individuals.
-
-        Moreover, the project aimed to tackle the unique sentence structure employed in ASL. ASL differs significantly from spoken languages in terms of grammar and syntax. Therefore, the system had to be designed to understand and interpret the grammatical rules of ASL accurately. This aspect presented a significant challenge for our team, as it required deep understanding and analysis of ASL linguistics.
-
-        The other significant aspect of our project was the design of the robotic hand used for signing. We recognized the importance of creating a hand that was specifically optimized for signing, taking into account the intricate movements and gestures required for accurate ASL communication. The hand design needed to be both precise and dexterous, capable of reproducing the subtle nuances and expressiveness of human signing.
-
-        Throughout the project, the team faced numerous technical and logistical challenges. Designing and building a functional system within a limited budget and timeframe required careful planning, resourcefulness, and efficient use of available materials and technologies.
-
-        % To accomplish the project goals, the team employed a multidisciplinary approach, combining knowledge and skills from various engineering fields such as robotics, signal processing, and machine learning. The team members worked collaboratively, leveraging their diverse expertise to tackle different aspects of the project.
-
-        % In conclusion, the Final Engineering Project for the 60th Georgia Governor's Honor Program aimed to develop a unique system that could convert voice input into ASL output in real-time. By focusing on real-time interpretation, ASL grammar, and a signing-optimized hand design, the project sought to overcome existing limitations in the field. The endeavor required innovation, technical expertise, and collaboration, ultimately aiming to provide a valuable tool for both presentations and the teaching of sign language.
-      \end{block}
 
       \begin{block}{Goal}
         \header{Goal}[0pt]
@@ -212,6 +149,77 @@
           \item 1 Raspberry PI 4B
           \item \texttt{faster\_whisper}, \texttt{pytorch}, \texttt{asyncio}, \texttt{pyav}, \texttt{aiohttp}, \texttt{aiortc}, Expo Framework.
         \end{itemize}
+      \end{block}
+    \end{column}
+
+    \separatorcolumn
+
+    \begin{column}{\twocolwidth}
+      \begin{block}{Introduction}
+        \begin{multicols}{2}
+          % The Final Engineering Project for the 60th Georgia Governor's Honor Program was an ambitious endeavor that spanned over 9 days, with a modest budget of \$150.
+
+          % The goal of the project was to design a groundbreaking system capable of converting voice input into American Sign Language (ASL) output in real-time. The primary purpose of this system was to serve as a presentation aide and an educational tool for teaching sign language.
+
+          One of the key distinguishing features of this project was its real-time interpretation capability. Unlike existing systems that often require a delay between input and output, our team aimed to develop a solution that could instantaneously translate spoken words into sign language. This real-time aspect was crucial to ensure smooth and efficient communication between hearing and deaf individuals.
+
+          Moreover, the project aimed to tackle the unique sentence structure employed in ASL. ASL differs significantly from spoken languages in terms of grammar and syntax. Therefore, the system had to be designed to understand and interpret the grammatical rules of ASL accurately. This aspect presented a significant challenge for our team, as it required deep understanding and analysis of ASL linguistics.
+
+          The other significant aspect of our project was the design of the robotic hand used for signing. We recognized the importance of creating a hand that was specifically optimized for signing, taking into account the intricate movements and gestures required for accurate ASL communication. The hand design needed to be both precise and dexterous, capable of reproducing the subtle nuances and expressiveness of human signing.
+
+          Throughout the project, the team faced numerous technical and logistical challenges. Designing and building a functional system within a limited budget and timeframe required careful planning, resourcefulness, and efficient use of available materials and technologies.
+
+          % To accomplish the project goals, the team employed a multidisciplinary approach, combining knowledge and skills from various engineering fields such as robotics, signal processing, and machine learning. The team members worked collaboratively, leveraging their diverse expertise to tackle different aspects of the project.
+
+          % In conclusion, the Final Engineering Project for the 60th Georgia Governor's Honor Program aimed to develop a unique system that could convert voice input into ASL output in real-time. By focusing on real-time interpretation, ASL grammar, and a signing-optimized hand design, the project sought to overcome existing limitations in the field. The endeavor required innovation, technical expertise, and collaboration, ultimately aiming to provide a valuable tool for both presentations and the teaching of sign language.
+        \end{multicols}
+      \end{block}
+
+      \begin{block}{System Architeture}
+        \begin{minipage}{0.48\linewidth}
+          \begin{figure}[ht]
+            \centering
+            \includegraphics[width=\linewidth]{images/flowchart.png}
+            \caption{Flowchart of the system architecture}
+            \label{fig:flowchart}
+          \end{figure}
+        \end{minipage}\hfill%
+        \begin{minipage}{0.48\linewidth}
+          \begin{itemize}
+            \item The user speaks into the Worley application on their phone.
+            \item The application establishes a Web real-time communication (WebRTC) connection with the server and streams the audio.
+            \item The server runs a lightweight voice activation detection (VAD) model \texttt{sliero} detects speech. Such results are buffered into a queue along with the timestamps, and a 2-pointer technique is used to extract the longest continuous subsequence, \ie, the speech. Such segments are sent to \texttt{whisper} for speech recognition.
+            \item The text is translated to ASL language using a custom-built transformer model trained on the \texttt{ASLG-PC12} dataset.
+            \item The ASL translation is sent to the Raspberry Pi, which controls the robotic hand, and the mobile application.
+          \end{itemize}
+        \end{minipage}
+      \end{block}
+
+      \begin{block}{Mechanical Design}
+        \begin{minipage}[t]{0.48\linewidth}
+          \header{Cord Actuation}[0pt]
+
+          \begin{wrapfigure}{r}{0.5\linewidth}
+            \centering
+            \includegraphics[width=0.35\linewidth]{images/finger.png}
+            \caption{CAD of cord actuation design}
+            \label{fig:cord-actuation}
+          \end{wrapfigure}
+
+          The fingers are curled by servo-driven pull cords. By reducing the available length of the cord, the surfaces of the finger segments are pulled closer to one another. The surfaces are angled 90 degrees; so the finger rotates around the back (where there is no gap) to curl. We utilized ripoff SG90 servos for this task, as they're cost-effective, space-efficient, and have the minimum sufficient torque required to actuate the fingers.
+        \end{minipage}\hfill%
+        \begin{minipage}[t]{0.48\linewidth}
+          \header{Compliant Hinges}[0pt]
+
+          \begin{wrapfigure}{r}{0.5\linewidth}
+            \centering
+            \includegraphics[width=0.75\linewidth]{images/compliant-hinge.png}
+            \caption{CAD of compliant hinge design}
+            \label{fig:compliant-hinge}
+          \end{wrapfigure}
+
+          Compliant hinges connect the finger segments, allowing the finger to curl as a single part. This is accomplished by 3D printing the fingers in polypropylene (PP); a polymer ideally suited for compliant hinges due to its fatigue-resistant and semi-rigid properties. The hinges are designed using splines constrained by their connection points and length, such that when the segment is rotated 90 degrees it has the proper length to temporarily deform into a circle. The energy stored in this deformation allows the fingers to passively return to their original position when the cord tension is released.
+        \end{minipage}
       \end{block}
     \end{column}
 
