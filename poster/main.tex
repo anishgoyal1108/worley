@@ -1,6 +1,6 @@
-\documentclass[final, 20pt]{beamer}
+\documentclass[final, 16pt]{beamer}
 % poster
-\usepackage[size=custom, width=121.92, height=91.44]{beamerposter}
+\usepackage[size=custom, width=101.6, height=71.1]{beamerposter}
 % common stuff
 \usepackage{graphicx}
 \usepackage{hyperref}
@@ -22,7 +22,7 @@
 % font
 \usefonttheme{serif}
 \setbeamerfont{block title}{size=\Large, series=\bfseries}
-\setbeamerfont{headline title}{size=\fontsize{96}{0pt}\selectfont, series=\bfseries}
+\setbeamerfont{headline title}{size=\fontsize{64}{0pt}\selectfont, series=\bfseries}
 \setbeamerfont{headline author}{size=\large, series=\bfseries}
 % main color
 \definecolor{theme-1}{HTML}{10b981} % #10b981
@@ -34,10 +34,10 @@
 \setbeamercolor{headline title}{fg=theme-4, fg=theme-1}
 % linespace
 \usepackage{setspace}
-\setstretch{1.5}
+\setstretch{1.25}
 % size
-\setlength{\paperwidth}{48in}
-\setlength{\paperheight}{36in}
+\setlength{\paperwidth}{40in}
+\setlength{\paperheight}{28in}
 \newlength{\sepwidth}
 \newlength{\colwidth}
 \newlength{\twocolwidth}
@@ -46,7 +46,7 @@
 \newlength{\marginwidth}
 
 \usepackage{calc}
-\setlength{\marginwidth}{1in}
+\setlength{\marginwidth}{0.5in}
 \setlength{\contentwidth}{\paperwidth - 2\marginwidth}
 \setlength{\contentheight}{\paperheight - 3in}
 \setlength{\sepwidth}{0.005\contentwidth}
@@ -121,8 +121,10 @@
 \begin{columns}[t]
 \margincolumn
 
-\begin{column}{\colwidth}
+\fontsize{22}{26}\selectfont
 
+\begin{column}{\colwidth}
+  \fontsize{22}{24}\selectfont
   \begin{block}{Background}
     \header{Goal}[0pt]
 
@@ -133,7 +135,7 @@
       \item Act out the translation on the robotic hand through remote general-purpose input/output (GPIO) control.
     \end{itemize}
 
-    \header{Motivation}[0.25cm]
+    \header{Motivation}[0pt]
 
     Our friend Cory suffers from hearing loss, making communication difficult. We aimed to develop a device to improve communication and quality of life for Cory and others in similar situations.
 
@@ -170,13 +172,13 @@
       \header{Existing Solution}[0pt]
     \begin{figure}[ht]
       \centering
-      \begin{subfigure}[b]{0.45\linewidth}
+      \begin{subfigure}[b]{0.38\linewidth}
         \centering
         \includegraphics[width=\linewidth]{images/aslan.png}
         \caption{Project ASLAN}
         \label{fig:aslan}
       \end{subfigure}
-      \begin{subfigure}[b]{0.45\linewidth}
+      \begin{subfigure}[b]{0.38\linewidth}
         \centering
         \includegraphics[width=0.425\linewidth]{images/instructable-hand.png}
         \caption{Instructable Hand}
@@ -188,18 +190,17 @@
     Despite the existing solutions, there are still many problems:
     
     \begin{itemize}
-      \item They merely perform manually-coded English (MCE), which is not the same as ASL and doesn't have the same grammar, syntax, and nuances.
-      \item They are incapable to act out ASL in real-time or require text input instead of speech input.
+      \item They merely perform manually-coded English (MCE).
+      \item They are incapable to act out ASL in real-time and require text input.
     \end{itemize}
     \end{minipage}\hfill%
     \begin{minipage}[t]{0.48\linewidth}
-      \header{Significance}[1cm]
-    
+      \header{Significance}[0pt]
+
       \begin{itemize}
         % \item 10,000 people in the United States are registered as ASL interpreters.
         \item In comparison, 37.5 million people in the United States suffer from hearing problems.
-      
-              % \item ASL is the third most used language in the United States \& the Americans with Disabilities Act (ADA) requires businesses to provide ASL interpreters.
+        % \item ASL is the third most used language in the United States \& the Americans with Disabilities Act (ADA) requires businesses to provide ASL interpreters.
         \item In the United States, 30 deaf children are born every day, and 90\% of their parents do not know ASL.
         \item \emph{WORLEY} will help to solve this problem by providing a low-cost, portable, and easy-to-use solution for ASL interpretation.
       \end{itemize}
@@ -232,7 +233,7 @@
     \begin{minipage}[t]{0.48\linewidth}
       \header{Cord Actuation}[0pt]
 
-      \begin{wrapfigure}{r}{0.5\linewidth}
+      \begin{wrapfigure}{r}{0.30\linewidth}
         \centering
         \includegraphics[width=0.35\linewidth]{images/finger.png}
         \caption{CAD of cord actuation design}
@@ -244,7 +245,7 @@
     \begin{minipage}[t]{0.48\linewidth}
       \header{Compliant Hinges}[0pt]
 
-      \begin{wrapfigure}{r}{0.5\linewidth}
+      \begin{wrapfigure}{r}{0.30\linewidth}
         \centering
         \includegraphics[width=0.75\linewidth]{images/compliant-hinge.png}
         \caption{CAD of compliant hinge design}
@@ -259,6 +260,7 @@
 \separatorcolumn
 
 \begin{column}{\colwidth}
+  \fontsize{22}{24}\selectfont
   \begin{block}{Challenges}
     \begin{itemize}
       \item More tolerance would be needed for the servo motors to control the index finger to move behind the palm.
@@ -288,7 +290,7 @@
       \item[Wire management] To make the hand more aesthetically pleasing, we will position the servos inside of a compartment in the upper arm, and run the wires through the arm to the hand.
     \end{description}
     
-    \header{Result}[0.2cm]
+    \header{Result}[0pt]
 
     Remarkably, WORLEY came to life in a mere nine days and a budget of just 150 USD. Moving forward, our aspirations lie in crafting a comprehensive prototype given ample time and resources. We triumph in knowing we successfully developed a robotic hand that can act out the ASL alphabet and be controlled using a mobile application with automatic speech recognition.
 
