@@ -122,32 +122,14 @@
 \margincolumn
 
 \begin{column}{\colwidth}
-  \begin{block}{Introduction}
-    The Final Engineering Project for the 60th Georgia Governor's Honor Program is a 9-day adventure.
-    % in which a team of 3 students worked together to design and build a unique system.
 
-    % The goal of the project was to design a groundbreaking system capable of converting voice input into American Sign Language (ASL) output in real-time. The primary purpose of this system was to serve as a presentation aide and an educational tool for teaching sign language.
-
-    One of the key distinguishing features of this project was its real-time interpretation capability. Unlike existing systems that often require a delay between input and output, our team aimed to develop a solution that could instantaneously translate spoken words into sign language. This real-time aspect was crucial to ensure smooth and efficient communication between hearing and deaf individuals.
-
-    Moreover, the project aimed to tackle the unique sentence structure employed in ASL. ASL differs significantly from spoken languages in terms of grammar and syntax. Therefore, the system had to be designed to understand and interpret the grammatical rules of ASL accurately. This aspect presented a significant challenge for our team, as it required a deep understanding and analysis of ASL linguistics.
-
-    The other significant aspect of our project was the design of the robotic hand used for signing. We recognized the importance of creating a hand that was specifically optimized for signing, taking into account the intricate movements and gestures required for accurate ASL communication. The hand design needed to be both precise and dexterous, capable of reproducing the subtle nuances and expressiveness of human signing.
-
-    Throughout the project, the team faced numerous technical and logistical challenges. Designing and building a functional system within a limited budget and timeframe required careful planning, resourcefulness, and efficient use of available materials and technologies.
-
-    % To accomplish the project goals, the team employed a multidisciplinary approach, combining knowledge and skills from various engineering fields such as robotics, signal processing, and machine learning. The team members worked collaboratively, leveraging their diverse expertise to tackle different aspects of the project.
-
-    % In conclusion, the Final Engineering Project for the 60th Georgia Governor's Honor Program aimed to develop a unique system that could convert voice input into ASL output in real-time. By focusing on real-time interpretation, ASL grammar, and a signing-optimized hand design, the project sought to overcome existing limitations in the field. The endeavor required innovation, technical expertise, and collaboration, ultimately aiming to provide a valuable tool for both presentations and the teaching of sign language.
-  \end{block}
-
-  \begin{block}{Goal}
+  \begin{block}{Background}
     \header{Goal}[0pt]
 
-    The goal of \textsc{Project Worley} is to create a wireless online real-time language expression yielder (WORLEY) that can be used to act out American Sign Language (ASL) in real time. Specifically, WORLEY will be able to:
+    The goal of \textsc{Project Worley} is to create a wireless online real-time language expression yielder (WORLEY) that can be used to act out American Sign Language (ASL) live. Specifically, WORLEY will be able to:
 
     \begin{itemize}
-      \item Recognize speech and translate it into ASL in real-time.
+      \item Recognize speech and translate it into ASL in real time.
       \item Act out the translation on the robotic hand through remote general-purpose input/output (GPIO) control.
     \end{itemize}
 
@@ -155,74 +137,75 @@
 
     Our friend Cory suffers from hearing loss, making communication difficult. We aimed to develop a device to improve communication and quality of life for Cory and others in similar situations.
 
-    This device can also be used for Pre-K and K-12 students.  While it may seem easy for parents to learn ASL and teach it to their kids, ASL is a complex language with its grammar, syntax, and nuances. WORLEY provides the necessary language exposure \& support for hard-of-hearing children and their parents.
+    This device can also be used for Pre-K and K-12 students.  While it may seem easy for parents to learn ASL and teach it to their kids, ASL is a complex language with its own grammar, syntax, and nuances. WORLEY provides the necessary language exposure \& support for hard-of-hearing children and their parents.
   \end{block}
-\end{column}
 
-\separatorcolumn
-
-\begin{column}{\twocolwidth}
-\begin{block}{Significance}
-\begin{minipage}[t]{0.48\linewidth}
-\header{Existing Solution}[0pt]
-\begin{figure}[ht]
-  \centering
-  \begin{subfigure}[b]{0.45\linewidth}
+  \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{images/aslan.png}
-    \caption{Project ASLAN}
-    \label{fig:aslan}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.45\linewidth}
-    \centering
-    \includegraphics[width=0.425\linewidth]{images/instructable-hand.png}
-    \caption{Instructable Hand}
-    \label{fig:instructable-hand}
-  \end{subfigure}
-\end{figure}
-\vspace{-1em}
+    \includegraphics[width=0.75\linewidth]{images/hand.png}
+    \caption{WORLEY's robotic hand.}
+    \label{fig:hand}
+  \end{figure}
 
-Despite the existing solutions, there are still many problems:
-
-\begin{itemize}
-  \item They merely perform manually-coded English (MCE), which is not the same as ASL and doesn't have the same grammar, syntax, and nuances.
-  \item They are incapable to act out ASL in real-time or require text input instead of speech input.
-\end{itemize}
-
-\header{Significance}[1cm]
-
-\begin{itemize}
-  % \item 10,000 people in the United States are registered as ASL interpreters.
-  \item In comparison, 37.5 million people in the United States suffer from hearing problems.
-
-        % \item ASL is the third most used language in the United States \& the Americans with Disabilities Act (ADA) requires businesses to provide ASL interpreters.
-  \item In the United States, 30 deaf children are born every day, and 90\% of their parents do not know ASL.
-  \item \emph{WORLEY} will help to solve this problem by providing a low-cost, portable, and easy-to-use solution for ASL interpretation.
-\end{itemize}
-\end{block}
-\end{column}
-
-\separatorcolumn
-
-\begin{column}{\twocolwidth}
   \begin{block}{Introduction}
-    \begin{multicols}{2}
-      % The Final Engineering Project for the 60th Georgia Governor's Honor Program is a 9-day adventure in which a team of 3 students worked together to design and build a unique system.
 
-      % The goal of the project was to design a groundbreaking system capable of converting voice input into American Sign Language (ASL) output in real-time. The primary purpose of this system was to serve as a presentation aide and an educational tool for teaching sign language.
+    One of the key distinguishing features of this project is its real-time interpretation capability. Unlike existing systems that require a delay between input and output, our team developed a solution that could instantaneously translate spoken words into sign language. 
 
-      One of the key distinguishing features of this project was its real-time interpretation capability. Unlike existing systems that often require a delay between input and output, our team aimed to develop a solution that could instantaneously translate spoken words into sign language. This real-time aspect was crucial to ensure smooth and efficient communication between hearing and deaf individuals.
+    Moreover, we designed WORLEY with the grammar and syntax of ASL in mind. ASL gloss is a shortened representation of traditional English with its own distinct syntax and grammar. Using transformers, WORLEY can translate spoken English into ASL gloss, which is then converted into ASL signs.
 
-      Moreover, the project aimed to tackle the unique sentence structure employed in ASL. ASL differs significantly from spoken languages in terms of grammar and syntax. Therefore, the system had to be designed to understand and interpret the grammatical rules of ASL accurately. This aspect presented a significant challenge for our team, as it required a deep understanding and analysis of ASL linguistics.
+    Another significant aspect of WORLEY lies in the design of the robotic hand. The hand does not have a reset stage between frames, which optimizes the signing process. Additionally, we designed an efficient rotation scheme for the thumb that reduced the DoF by 2, reducing the cost of the project and making it more accessible. 
 
-      The other significant aspect of our project was the design of the robotic hand used for signing. We recognized the importance of creating a hand that was specifically optimized for signing, taking into account the intricate movements and gestures required for accurate ASL communication. The hand design needed to be both precise and dexterous, capable of reproducing the subtle nuances and expressiveness of human signing.
+    % To accomplish the project goals, the team employed a multidisciplinary approach, combining knowledge and skills from various engineering fields such as robotics, signal processing, and machine learning. The team members worked collaboratively, leveraging their diverse expertise to tackle different aspects of the project.
 
-      Throughout the project, the team faced numerous technical and logistical challenges. Designing and building a functional system within a limited budget and timeframe required careful planning, resourcefulness, and efficient use of available materials and technologies.
+    % In conclusion, the Final Engineering Project for the 60th Georgia Governor's Honor Program aimed to develop a unique system that could convert voice input into ASL output in real-time. By focusing on real-time interpretation, ASL grammar, and a signing-optimized hand design, the project sought to overcome existing limitations in the field. The endeavor required innovation, technical expertise, and collaboration, ultimately aiming to provide a valuable tool for both presentations and the teaching of sign language.
+  \end{block}
 
-      % To accomplish the project goals, the team employed a multidisciplinary approach, combining knowledge and skills from various engineering fields such as robotics, signal processing, and machine learning. The team members worked collaboratively, leveraging their diverse expertise to tackle different aspects of the project.
+\end{column}
 
-      % In conclusion, the Final Engineering Project for the 60th Georgia Governor's Honor Program aimed to develop a unique system that could convert voice input into ASL output in real-time. By focusing on real-time interpretation, ASL grammar, and a signing-optimized hand design, the project sought to overcome existing limitations in the field. The endeavor required innovation, technical expertise, and collaboration, ultimately aiming to provide a valuable tool for both presentations and the teaching of sign language.
-    \end{multicols}
+\separatorcolumn
+
+\begin{column}{\twocolwidth}
+  \begin{block}{Significance}
+    \begin{minipage}[t]{0.48\linewidth}
+      \header{Existing Solution}[0pt]
+    \begin{figure}[ht]
+      \centering
+      \begin{subfigure}[b]{0.45\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/aslan.png}
+        \caption{Project ASLAN}
+        \label{fig:aslan}
+      \end{subfigure}
+      \begin{subfigure}[b]{0.45\linewidth}
+        \centering
+        \includegraphics[width=0.425\linewidth]{images/instructable-hand.png}
+        \caption{Instructable Hand}
+        \label{fig:instructable-hand}
+      \end{subfigure}
+    \end{figure}
+    \vspace{-1em}
+    
+    Despite the existing solutions, there are still many problems:
+    
+    \begin{itemize}
+      \item They merely perform manually-coded English (MCE), which is not the same as ASL and doesn't have the same grammar, syntax, and nuances.
+      \item They are incapable to act out ASL in real-time or require text input instead of speech input.
+    \end{itemize}
+    \end{minipage}\hfill%
+    \begin{minipage}[t]{0.48\linewidth}
+      \header{Significance}[1cm]
+    
+      \begin{itemize}
+        % \item 10,000 people in the United States are registered as ASL interpreters.
+        \item In comparison, 37.5 million people in the United States suffer from hearing problems.
+      
+              % \item ASL is the third most used language in the United States \& the Americans with Disabilities Act (ADA) requires businesses to provide ASL interpreters.
+        \item In the United States, 30 deaf children are born every day, and 90\% of their parents do not know ASL.
+        \item \emph{WORLEY} will help to solve this problem by providing a low-cost, portable, and easy-to-use solution for ASL interpretation.
+      \end{itemize}
+    \end{minipage}
+    
+  
   \end{block}
 
   \begin{block}{System Architeture}
@@ -293,11 +276,22 @@ Despite the existing solutions, there are still many problems:
       \item \texttt{faster\_whisper}, \texttt{pytorch}, \texttt{asyncio}, \texttt{pyav}, \texttt{aiohttp}, \texttt{aiortc}, Expo Framework.
     \end{itemize}
   \end{block}
+  \begin{block}{Conclusion}
+    \header{Future Work}[0pt]
 
-  \begin{block}{Conclusions}
-    In this project, we successfully developed a robotic hand that can act out ASL and be controlled using a mobile application and voice commands.
+    Despite WORLEY's current limitations, we believe it has the potential to be further developed and improved. Future work could implement the following:
+    
+    \begin{description}
+      \item[Speaker diarization] The current implementation cannot distinguish between multiple speakers.
+      \item[Advanced model deployment] The current implementation is not \emph{truly} real-time, since the model is not deployed independently from the HTTP server.
+      \item[Enhance realism] We want to make the hand more realistic. This can be done by adding ball joints to the thumb and wrist. We could also add a layer of silicone to simulate skin.
+      \item[Wire management] To make the hand more aesthetically pleasing, we will position the servos inside of a compartment in the upper arm, and run the wires through the arm to the hand.
+    \end{description}
+    
+    \header{Result}[0.2cm]
 
-    Despite defects in the final product, along with many challenges that we faced on the road, we believe that this project has the potential to be further developed and improved. Future work could focus on improving the performance and scalability of the speech recognition system, as well as enhancing the realism of the hand. Overall, this project demonstrates the potential of combining robotics, mobile applications, and speech recognition to create innovative and interactive systems.
+    Remarkably, WORLEY came to life in a mere nine days and a budget of just 150 USD. Moving forward, our aspirations lie in crafting a comprehensive prototype given ample time and resources. We triumph in knowing we successfully developed a robotic hand that can act out the ASL alphabet and be controlled using a mobile application with automatic speech recognition.
+
   \end{block}
 \end{column}
 
