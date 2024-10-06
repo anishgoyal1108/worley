@@ -10,7 +10,9 @@
 - Ian Oberbeck
 
 ## Overview
-We created a robot hand that can finger spell American Sign Language (ASL) in real time using spoken input from an app. Read [our poster](poster/Poster.pdf) for more information.
+We created a robot hand that can finger spell American Sign Language (ASL) in real time using spoken input from an app. 
+
+Read [our poster](poster/Poster.pdf) for more information!
 
 ## Key Features
 - **ASL translation**: WORLEY uses speech recognition technology and neural networks to translate spoken English into ASL gloss
