@@ -12,6 +12,8 @@
 ## Overview
 We created a robot hand that can finger spell American Sign Language (ASL) in real time using spoken input from an app. 
 
+![](log/img/3d-print/worley_signing.gif)
+
 Read [our poster](poster/Poster.pdf) for more information!
 
 ## Key Features
@@ -20,7 +22,7 @@ Read [our poster](poster/Poster.pdf) for more information!
 - **Cost-effective**: The project was built with affordable materials, including a Raspberry Pi, servos, and 3D-printed components
 
 ## Methodology
-WORLEY leverages a client-server architecture with WebRTC for communication. When a user speaks into the app, the server runs a lightweight Voice Activation Detection (VAD) system to identify speech. The detected speech is buffered into a queue with timestamps, and a 2-pointer technique is used to extract the longest continuous subsequence of spoken words. This subsequence is then processed through the Whisper Speech Recognition (WSPSR) system to obtain a transcript. The resulting transcript is fed into a custom-built transformer model, designed to translate English into ASL gloss—a simplified form of ASL where redundant words and grammar are omitted. The final translation is then wirelessly transmitted to the client, which communicates wiht the servo motors to control the signage of the robot hand.
+WORLEY leverages a client-server architecture with WebRTC for communication. When a user speaks into the app, the server runs a lightweight Voice Activation Detection (VAD) system to identify speech. The detected speech is buffered into a queue with timestamps, and a 2-pointer technique is used to extract the longest continuous subsequence of spoken words. This subsequence is then processed through the Whisper Speech Recognition (WSPSR) system to obtain a transcript. The resulting transcript is fed into a custom-built transformer model, designed to translate English into ASL gloss—a simplified form of ASL where redundant words and grammar are omitted. The final translation is then wirelessly transmitted to the client, which communicates with the servo motors to control the signage of the robot hand.
 
 ## Novel Approach?
 ASL is considered a completely separate language than English because it has its own rules, syntax, and abstractions, stripping away all unnecessary articles, prepositions, and conjugations to focus on the essential meaning of a sentence (e.g., "Bob crossed the street" becomes "BOB CROSS STREET"). WORLEY translates spoken English sentences into ASL gloss before performing any finger spellings by using state-of-the-art neural networks called transformers, which are particularly well-suited for data involving many-to-many relationships. **We are the first to accomplish this.** Additionally, many robot hands have been designed in science fairs for the purpose of finger spelling, but we only found one that was capable of spelling words in real time, and even then, it operates using text, not spoken, input.
