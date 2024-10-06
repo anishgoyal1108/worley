@@ -5,8 +5,8 @@
 </p>
 
 ## Authors
-- Anish Goyal @anishgoyal1108
-- Yubo Cao @Yubo-Cao
+- Anish Goyal [@anishgoyal1108](https://github.com/anishgoyal1108)
+- Yubo Cao [@Yubo-Cao](https://github.com/Yubo-Cao)
 - Ian Oberbeck
 
 ## Overview
