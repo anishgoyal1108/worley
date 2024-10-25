@@ -54,4 +54,6 @@ ASL is considered a completely separate language than English because it has its
 - **Wire Management**: Streamline the design by hiding servos and running wires internally
 
 ## Acknowledgements
-Remarkably, WORLEY came to life in just two weeks and a $150 budget. We would like to thank the Georgia Governor's Honors Program and Georgia Southern University for giving us the opportunity to work on this project and allowing us to present our work at a research symposium. Additionally, we would like to thank our program instructors, Anupam Goli, Craig Worley, and DeJah Crossfield for their mentorship.
+Remarkably, WORLEY came to life in just two weeks and a $150 budget. We would like to thank the Georgia Governor's Honors Program and Georgia Southern University for giving us the opportunity to work on this project and allowing us to present our work at a research symposium.
+
+Additionally, we would like to thank our program instructors, Anupam Goli, Craig Worley, Kai Ouyang, and DeJah Crossfield for their mentorship.
